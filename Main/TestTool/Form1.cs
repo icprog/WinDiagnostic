@@ -16,6 +16,7 @@ namespace TestTool
     public partial class Form1 : Form
     {
         dynamic jsobj = null;
+        JObject jobj_global = null;        
         List<Thread> threads = new List<Thread>();
         Thread thread_test;
         JObject js_result = new JObject();
@@ -40,6 +41,9 @@ namespace TestTool
             {
                 list_strItems.Add(key);
                 js_result.Add(key,jobj);
+                JObject j = JObject.Parse(File.ReadAllText(key+"\\"+key+"_"+ jsobj.model + ".json"));
+                j.Merge(jobj_global, new JsonMergeSettings { MergeArrayHandling = MergeArrayHandling.Union });
+                File.WriteAllText(key + "\\config.json", j.ToString());
             }
             return node;
         }
@@ -51,7 +55,8 @@ namespace TestTool
             {
                 MessageBox.Show(filepath + " not found.");
                 return ;
-            }            
+            }
+            jobj_global = JObject.Parse(File.ReadAllText("global_config.json"));
             jsobj = JObject.Parse(File.ReadAllText(filepath));
             treeView_items.ShowLines = true;
 
@@ -62,6 +67,7 @@ namespace TestTool
             {
                 treeView_items.Nodes.Add(build_node(item, (JObject)jsobj[item]));
             }
+            treeView_items.ExpandAll();
             return;
         }
 

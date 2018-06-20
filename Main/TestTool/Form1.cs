@@ -20,7 +20,7 @@ namespace TestTool
         List<Thread> threads = new List<Thread>();
         Thread thread_test;
         JObject js_result = new JObject();
-        List<string> list_strItems = new List<string>();
+        List<TreeNode> list_treenode_items = new List<TreeNode>();
 
         public Form1()
         {
@@ -30,6 +30,7 @@ namespace TestTool
         private TreeNode build_node(string key, JObject jobj)
         {
             TreeNode node = new TreeNode(key);
+            node.Name=key;
             if (jobj["items"] != null)
             {
                 foreach (string item in jobj["items"])
@@ -38,13 +39,14 @@ namespace TestTool
                 }
             }
             else
-            {
-                list_strItems.Add(key);
+            {                
                 js_result.Add(key,jobj);
                 JObject j = JObject.Parse(File.ReadAllText(key+"\\"+key+"_"+ jsobj.model + ".json"));
                 j.Merge(jobj_global, new JsonMergeSettings { MergeArrayHandling = MergeArrayHandling.Union });
                 File.WriteAllText(key + "\\config.json", j.ToString());
+                list_treenode_items.Add(node);
             }
+            
             return node;
         }
 
@@ -63,11 +65,14 @@ namespace TestTool
             treeView_items.Nodes.Add("Serial Number : " + jsobj.sno);
             treeView_items.Nodes.Add("Model : " + jsobj.model);
 
+            js_result.Add("sno", jsobj.sno);
+            js_result.Add("model", jsobj.model);
+
             foreach (string item in jsobj["items"])
             {
-                treeView_items.Nodes.Add(build_node(item, (JObject)jsobj[item]));
+                treeView_items.Nodes.Add(build_node(item, (JObject)jsobj[item]));                
             }
-            treeView_items.ExpandAll();
+            treeView_items.ExpandAll();            
             return;
         }
 
@@ -101,7 +106,10 @@ namespace TestTool
 
             foreach (string item in jobj["manual"]["items"])
             {
+                TreeNode node = treeView_items.Nodes["manual"].Nodes[item];
+                ShowStatus(node, 2);
                 createProcess(jobj["manual"][item]);
+                ShowStatus(node, isfailed(node.Text));
             }
 
             foreach (string item in jobj["automatic"]["items"])
@@ -111,19 +119,41 @@ namespace TestTool
                 t.Start(jobj["automatic"][item]);
             }
 
-            bool isCompleted = false;
-            while(!isCompleted)
+            bool isCompleted = false;            
+            while (!isCompleted)
             {
                 isCompleted = true;
-                foreach(string item in list_strItems)
+                foreach (TreeNode node in list_treenode_items)
                 {
-                    if (js_result[item]["result"]==null)
+                    if (node.Text.Contains("PASS") || node.Text.Contains("FAIL"))
+                        continue;
+                    int r = isfailed(node.Name);
+                    if (r == -1)
                     {
                         isCompleted = false;
+                        continue;
                     }
+                    else
+                        ShowStatus(node, r);
                 }
+                Thread.Sleep(3000);
             }
-            btn_start.Text = "Start";
+            File.WriteAllText("test_result.json", js_result.ToString());
+            ModifyControlStr(btn_start, "Start");
+        }
+        private int isfailed(string item)
+        {
+            string strFile = item + "\\result.json";
+            if (!File.Exists(strFile))
+            {
+                return -1;
+            }
+            JObject j = new JObject();
+            j.Add(item, JObject.Parse(File.ReadAllText(strFile)));
+            js_result.Merge(j, new JsonMergeSettings { MergeArrayHandling = MergeArrayHandling.Union });
+            if ((bool)j[item]["result"] == true)
+                return 1;
+            return 0;
         }
 
         public void MultiThread(object obj)
@@ -131,6 +161,8 @@ namespace TestTool
             JObject jobj = obj as JObject;
             if (jobj["items"] == null)
             {
+                TreeNode node = findNode(treeView_items.Nodes, (string)jobj["name"]);
+                ShowStatus(node, 2);
                 createProcess(jobj);
             }
             else
@@ -142,18 +174,81 @@ namespace TestTool
             }
         }
 
+
+        public delegate void ModifyTreeNodeStrDelegate(TreeNode node, string str);
+        private void ModifyControlStr(TreeNode node, string str)
+        {            
+            if (this.InvokeRequired)
+            {
+                ModifyTreeNodeStrDelegate d = new ModifyTreeNodeStrDelegate(ModifyControlStr);
+                this.Invoke(d, node, str);
+            }
+            else
+                node.Text = str;
+        }
+
+        public delegate void ModifyControlStrDelegate(Control ctl, string str);
+        private void ModifyControlStr(Control ctl, string str)
+        {
+            if (this.InvokeRequired)
+            {
+                ModifyControlStrDelegate d = new ModifyControlStrDelegate(ModifyControlStr);
+                this.Invoke(d, ctl, str);
+            }
+            else
+                ctl.Text = str;
+        }
+
+        private void ShowStatus(TreeNode node, int i)
+        {
+            string str = "";
+            if (i == -1)
+                return;
+            switch(i)
+            {
+                case 0:
+                    str = "  _FAIL";
+                    break;
+                case 1:
+                    str = "  _PASS";
+                    break;
+                case 2:
+                    str = "  _TESTING...";
+                    break;
+            }
+            ModifyControlStr(node, node.Name + str);
+        }
+
+        private TreeNode findNode(TreeNodeCollection nodes, string key)
+        {
+            TreeNode node = nodes[key];
+            if ( node == null)
+            {
+                for (int i = 0; i < nodes.Count; i++)
+                {
+                    node = findNode(nodes[i].Nodes, key);
+                    if (node!=null) break;
+                }                
+            }
+            return node;
+        }
+
         public void createProcess(object obj)
         {
-            //Process.Start(strFile);
-            int i = 0;
             JObject jobj = obj as JObject;
-            while (true)
-            {
-                Console.WriteLine((string)jobj["name"] + i.ToString());
-                Thread.Sleep(1000);
-                i++;
-                if (i > 10) break;
-            }
+
+            Process p = Process.Start((string)jobj["path"]+"\\"+ (string)jobj["name"]+".exe");
+            if (!p.WaitForExit(1000*(int)jobj["timeout"]))
+                p.Kill();
+
+            //int i = 0;
+            //while (true)
+            //{
+            //    Console.WriteLine((string)jobj["name"] + i.ToString());
+            //    Thread.Sleep(1000);
+            //    i++;
+            //    if (i > 1) break;
+            //}
         }
     }    
 }

@@ -1,0 +1,37 @@
+{
+  "sno": "xxxxxxx",
+  "model": "M101B",
+  "items": [ "manual", "automatic" ],
+  "manual": {
+    "name": "Manual",
+    "items": [ "touch" ],
+    "touch": {
+      "name": "Touch",
+      "path": "touch",
+      "timeout": 120
+    }
+  },
+  "automatic": {
+    "name": "Automatic",
+    "items": [ "audio", "network" ],
+    "audio": {
+      "name": "Audio",
+      "path": "audio",
+      "timeout": 120
+    },
+    "network": {
+      "name": "Network",
+      "items": [ "nic", "wifi" ],
+      "nic": {
+        "name": "NIC",
+        "path": "nic",
+        "timeout": 120
+      },
+      "wifi": {
+        "name": "WIFI",
+        "path": "wifi",
+        "timeout": 120
+      }
+    }
+  }
+}

@@ -35,25 +35,29 @@
             // 
             // treeView_items
             // 
-            this.treeView_items.Location = new System.Drawing.Point(12, 53);
+            this.treeView_items.Font = new System.Drawing.Font("Calibri", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.treeView_items.Location = new System.Drawing.Point(18, 71);
+            this.treeView_items.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.treeView_items.Name = "treeView_items";
-            this.treeView_items.Size = new System.Drawing.Size(317, 385);
+            this.treeView_items.Size = new System.Drawing.Size(474, 512);
             this.treeView_items.TabIndex = 0;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 38);
+            this.label1.Location = new System.Drawing.Point(18, 50);
+            this.label1.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(53, 12);
+            this.label1.Size = new System.Drawing.Size(72, 16);
             this.label1.TabIndex = 1;
             this.label1.Text = "測試項目";
             // 
             // btn_start
             // 
-            this.btn_start.Location = new System.Drawing.Point(245, 12);
+            this.btn_start.Location = new System.Drawing.Point(367, 16);
+            this.btn_start.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.btn_start.Name = "btn_start";
-            this.btn_start.Size = new System.Drawing.Size(84, 38);
+            this.btn_start.Size = new System.Drawing.Size(126, 50);
             this.btn_start.TabIndex = 2;
             this.btn_start.Text = "Start";
             this.btn_start.UseVisualStyleBackColor = true;
@@ -61,14 +65,16 @@
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(1200, 600);
             this.Controls.Add(this.btn_start);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.treeView_items);
+            this.Font = new System.Drawing.Font("新細明體", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(136)));
+            this.Margin = new System.Windows.Forms.Padding(5, 4, 5, 4);
             this.Name = "Form1";
-            this.Text = "WinDiagnostic";
+            this.Text = "WinDiagnostic  v180625";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

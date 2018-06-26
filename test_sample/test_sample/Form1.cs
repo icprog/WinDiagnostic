@@ -44,5 +44,10 @@ namespace test_sample
             File.WriteAllText(strResultFile, j.ToString());
             Close();
         }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            File.WriteAllText(strPath+"\\completed", "");
+        }
     }
 }

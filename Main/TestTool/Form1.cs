@@ -27,6 +27,7 @@ namespace TestTool
             InitializeComponent();
         }
 
+#if false
         private TreeNode build_node(string key, JObject jobj)
         {
             TreeNode node = new TreeNode(key);
@@ -47,6 +48,31 @@ namespace TestTool
                 list_treenode_items.Add(node);
             }
             
+            return node;
+        }
+#endif
+        private TreeNode build_node(string key, JObject jobj)
+        {
+            TreeNode node = new TreeNode(key);
+            node.Name = key;
+            if (jobj["items"] != null)
+            {
+                foreach (string item in jobj["items"])
+                {
+                    //node.Nodes.Add(build_node(item, (JObject)jobj[item]));
+                    build_node(item, (JObject)jobj[item]);
+                }
+            }
+            else
+            {
+                js_result.Add(key, jobj);
+                JObject j = JObject.Parse(File.ReadAllText(key + "\\" + key + "_" + jsobj.model + ".json"));
+                j.Merge(jobj_global, new JsonMergeSettings { MergeArrayHandling = MergeArrayHandling.Union });
+                File.WriteAllText(key + "\\config.json", j.ToString());
+                list_treenode_items.Add(node);
+                node.ForeColor = Color.Purple;
+                treeView_items.Nodes.Add(node);
+            }
             return node;
         }
 
@@ -70,8 +96,10 @@ namespace TestTool
 
             foreach (string item in jsobj["items"])
             {
-                treeView_items.Nodes.Add(build_node(item, (JObject)jsobj[item]));                
+                //treeView_items.Nodes.Add(build_node(item, (JObject)jsobj[item]));
+                build_node(item, (JObject)jsobj[item]);
             }
+
             treeView_items.ExpandAll();            
             return;
         }
@@ -100,6 +128,51 @@ namespace TestTool
             }
         }
 
+        public void TestThread(object obj)
+        {
+            JObject jobj = obj as JObject;
+
+            foreach (string item in jobj["items"])
+            {
+                JObject jsubobj = jobj[item] as JObject;
+                if (jsubobj["items"] != null)
+                {                    
+                    foreach (string subitem in jsubobj["items"])
+                    {
+                        Thread t = new Thread(new ParameterizedThreadStart(MultiThread));
+                        threads.Add(t);
+                        t.Start(jsubobj[subitem]);
+                    }
+                    bool isCompleted = false;
+                    while (!isCompleted)
+                    {
+                        isCompleted = true;
+                        foreach (TreeNode node in list_treenode_items)
+                        {
+                            //if (node.Text.Contains("PASS") || node.Text.Contains("FAIL"))
+                            if (node.ForeColor == Color.Green || node.ForeColor == Color.Red)
+                                continue;
+                            int r = isfailed(node.Name);
+                            if (r == -1)
+                            {
+                                isCompleted = false;
+                                continue;
+                            }
+                            else
+                                ShowStatus(node, r);
+                        }
+                        Thread.Sleep(3000);
+                    }
+                }
+                else
+                {
+                    MultiThread(jsubobj);
+                }
+            }            
+            File.WriteAllText("test_result.json", js_result.ToString());
+            ModifyControlStr(btn_start, "Start");
+        }
+#if false
         public void TestThread(object obj)
         {
             JObject jobj = obj as JObject;
@@ -141,9 +214,15 @@ namespace TestTool
             File.WriteAllText("test_result.json", js_result.ToString());
             ModifyControlStr(btn_start, "Start");
         }
+#endif
         private int isfailed(string item)
         {
-            string strFile = item + "\\result.json";
+            string strFile = item + "\\completed";
+            if (!File.Exists(strFile))
+            {
+                return -1;
+            }
+            strFile = item + "\\result.json";
             if (!File.Exists(strFile))
             {
                 return -1;
@@ -174,7 +253,18 @@ namespace TestTool
             }
         }
 
-
+        public delegate void ModifyControlStrDelegate(Control ctl, string str);
+        private void ModifyControlStr(Control ctl, string str)
+        {
+            if (this.InvokeRequired)
+            {
+                ModifyControlStrDelegate d = new ModifyControlStrDelegate(ModifyControlStr);
+                this.Invoke(d, ctl, str);
+            }
+            else
+                ctl.Text = str;
+        }
+#if false
         public delegate void ModifyTreeNodeStrDelegate(TreeNode node, string str);
         private void ModifyControlStr(TreeNode node, string str)
         {            
@@ -187,24 +277,12 @@ namespace TestTool
                 node.Text = str;
         }
 
-        public delegate void ModifyControlStrDelegate(Control ctl, string str);
-        private void ModifyControlStr(Control ctl, string str)
-        {
-            if (this.InvokeRequired)
-            {
-                ModifyControlStrDelegate d = new ModifyControlStrDelegate(ModifyControlStr);
-                this.Invoke(d, ctl, str);
-            }
-            else
-                ctl.Text = str;
-        }
-
         private void ShowStatus(TreeNode node, int i)
         {
             string str = "";
             if (i == -1)
                 return;
-            switch(i)
+            switch (i)
             {
                 case 0:
                     str = "  _FAIL";
@@ -218,6 +296,37 @@ namespace TestTool
             }
             ModifyControlStr(node, node.Name + str);
         }
+#endif
+
+        public delegate void ModifyTreeNodeColorDelegate(TreeNode node, Color color);
+        private void ModifyTreeNodeColor(TreeNode node, Color color)
+        {
+            if (this.InvokeRequired)
+            {
+                ModifyTreeNodeColorDelegate d = new ModifyTreeNodeColorDelegate(ModifyTreeNodeColor);
+                this.Invoke(d, node, color);
+            }
+            else
+                node.ForeColor = color;
+        }
+        private void ShowStatus(TreeNode node, int i)
+        {
+            if (i == -1)
+                return;
+            switch (i)
+            {
+                case 0:
+                    ModifyTreeNodeColor(node, Color.Red);                    
+                    break;
+                case 1:
+                    ModifyTreeNodeColor(node, Color.Green);
+                    break;
+                case 2:
+                    ModifyTreeNodeColor(node, Color.Blue);
+                    break;
+            }            
+        }
+
 
         private TreeNode findNode(TreeNodeCollection nodes, string key)
         {

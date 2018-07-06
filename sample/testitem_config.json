@@ -1,38 +1,19 @@
 {
   "sno": "xxxxxxx",
   "model": "M101B",
-  "items": [ "TOUCH", "automatic" ],
-  "TOUCH": {
-    "name": "Touch",
-    "path": "touch",
-    "timeout": 120
-  },
+  "items": [ "automatic" ],
   "automatic": {
     "name": "Automatic",
-    "items": [ "AUDIO","USB", "NETWORK" ],
+    "items": [ "AUDIO","USB"],
     "AUDIO": {
       "name": "Audio",
       "path": "audio",
       "timeout": 120
     },
-	"USB": {
+	  "USB": {
       "name": "USB",
       "path": "usb",
       "timeout": 120
-    },
-    "NETWORK": {
-      "name": "Network",
-      "items": [ "NIC", "WIFI" ],
-      "NIC": {
-        "name": "NIC",
-        "path": "nic",
-        "timeout": 120
-      },
-      "WIFI": {
-        "name": "WIFI",
-        "path": "wifi",
-        "timeout": 120
-      }
     }
   }
 }

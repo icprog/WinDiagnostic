@@ -19,7 +19,7 @@ rmdir Windiagnostic\Windiagnostic
 rmdir Windiagnostic\SerialNumber
 
 copy sample\*.json Windiagnostic\
-#for /f "delims=" %%i in ('"dir/a:d/b sample"') do (
-#mkdir Windiagnostic\%%i
-#copy sample\%%i\*.json  Windiagnostic\%%i
-#)
+for /f "delims=" %%i in ('"dir/a:d/b sample"') do (
+mkdir Windiagnostic\%%i
+copy sample\%%i\*.json  Windiagnostic\%%i
+)

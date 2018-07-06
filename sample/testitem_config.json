@@ -9,10 +9,15 @@
   },
   "automatic": {
     "name": "Automatic",
-    "items": [ "AUDIO", "NETWORK" ],
+    "items": [ "AUDIO","USB", "NETWORK" ],
     "AUDIO": {
       "name": "Audio",
       "path": "audio",
+      "timeout": 120
+    },
+	"USB": {
+      "name": "USB",
+      "path": "usb",
       "timeout": 120
     },
     "NETWORK": {

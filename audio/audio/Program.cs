@@ -94,16 +94,15 @@ namespace audio
                     case Result.ExceptionFail:
                         Console.WriteLine("ExceptionFail");
                         break;
-                }
-
-                File.WriteAllText(GetFullPath("result.json"), result.ToString());
-                File.Create(GetFullPath("complete"));
+                }                
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
             }
 
+            File.WriteAllText(GetFullPath("result.json"), result.ToString());
+            File.Create(GetFullPath("completed"));
             Console.ReadLine();
         }
     }

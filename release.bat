@@ -4,6 +4,7 @@ for /f "delims=" %%i in ('"dir/a:d/b"') do (
 mkdir Windiagnostic\%%i
 copy %%i\%%i\bin\Release\*.exe  Windiagnostic\%%i
 copy %%i\%%i\bin\Release\*.dll  Windiagnostic\%%i
+copy %%i\%%i\bin\Release\*.wav  Windiagnostic\%%i
 )
 
 copy Main\TestTool\bin\Release\*.exe Windiagnostic\

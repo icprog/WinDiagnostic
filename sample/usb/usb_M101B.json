@@ -1,0 +1,7 @@
+{
+  "name": "usb_m101b",
+  "USBDevice": 1,
+  "SDDevice": 1,
+  "EnableUsbTransferTest": 0,
+  "ShowWindow": false
+}

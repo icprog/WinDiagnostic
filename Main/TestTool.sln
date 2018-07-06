@@ -7,6 +7,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestTool", "TestTool\TestTo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "test_sample", "..\test_sample\test_sample\test_sample.csproj", "{C68E5092-4098-4B19-9998-18C177DFD529}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WmLib", "..\WmLib\WmLib\WmLib.csproj", "{5B289707-0402-46DD-9EF6-DCE58EBBC488}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SerialNumber", "..\SerialNumber\SerialNumber\SerialNumber.csproj", "{7FE051FA-AD4C-4C13-8FA1-8313395A1F8A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{C68E5092-4098-4B19-9998-18C177DFD529}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C68E5092-4098-4B19-9998-18C177DFD529}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C68E5092-4098-4B19-9998-18C177DFD529}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B289707-0402-46DD-9EF6-DCE58EBBC488}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B289707-0402-46DD-9EF6-DCE58EBBC488}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B289707-0402-46DD-9EF6-DCE58EBBC488}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B289707-0402-46DD-9EF6-DCE58EBBC488}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7FE051FA-AD4C-4C13-8FA1-8313395A1F8A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7FE051FA-AD4C-4C13-8FA1-8313395A1F8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7FE051FA-AD4C-4C13-8FA1-8313395A1F8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7FE051FA-AD4C-4C13-8FA1-8313395A1F8A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

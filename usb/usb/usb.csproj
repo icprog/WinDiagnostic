@@ -48,8 +48,9 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="USBClassLibrary">
-      <HintPath>..\..\..\USBClassLibrary\bin\Release\USBClassLibrary.dll</HintPath>
+    <Reference Include="USBClassLibrary, Version=1.0.5.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>.\USBClassLibrary.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

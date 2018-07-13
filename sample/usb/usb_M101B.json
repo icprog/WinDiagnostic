@@ -2,6 +2,7 @@
   "name": "usb_m101b",
   "USBDevice": 1,
   "SDDevice": 1,
-  "EnableUsbTransferTest": 0,
+  "DockingUsbDevice": 2,
+  "EnableUsbTransferTest": 1,
   "ShowWindow": false
 }

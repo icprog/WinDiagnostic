@@ -40,9 +40,9 @@
     <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\..\Main\packages\Newtonsoft.Json.11.0.2\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="SpeakerMicAutoTestApi, Version=1.0.0.10, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="SpeakerMicAutoTestApi, Version=1.0.1.1, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>.\SpeakerMicAutoTestApi.dll</HintPath>
+      <HintPath>..\..\..\AudioLibApp\SpeakerMicAutoTestApi\bin\Release\SpeakerMicAutoTestApi.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

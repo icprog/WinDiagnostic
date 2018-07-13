@@ -8,30 +8,49 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Management;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using USBClassLibrary;
 
 namespace usb
 {
     public partial class usb : Form
     {
+        [DllImport("kernel32.dll", SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern void AllocConsole();
+
+        public enum Device
+        {
+            SDCard,
+            USB
+        }
+
         bool IsDebugMode = true; // 是否開啟 Trace.WriteLine()顯示
         bool ShowWindow = false;
         string[] USBFlash = new string[255];
         string SourceFileName = "";
+        int RealExistingRemovableDevice = 0;
+        int DockingUsbDevice = 1;
         int USBDevice = 1;    // 有幾個USB插槽需要測試
         int SDDevice = 1;     // 0代表沒有SD裝置, 1代表有（會切換SD Card GroupBox頁面顯示與否）
         int EnableUsbTransferTest = 0; // 是否要啟用檔案傳輸測試功能, 0為關閉, 1為開啟
         int IsRemovableTransferred = 0;
         int ExistingRemovableDevice = 0; // 用來計算測試時機器上有多少已偵測到的USB裝置跟SD卡
         int ExistingSDCard = 0; // 用來計算測試時機器上有多少已偵測到的SD卡
-        private readonly ManagementScope ScopeCIMV2 = new ManagementScope("\\\\.\\ROOT\\cimv2");
-        private readonly ObjectQuery queryPnPEntity = new ObjectQuery("SELECT * FROM Win32_PnPEntity");
+        ManagementScope ScopeCIMV2 = new ManagementScope("\\\\.\\ROOT\\cimv2");
+        ObjectQuery queryPnPEntity = new ObjectQuery("SELECT * FROM Win32_PnPEntity");
+        ObjectQuery queryUsbHub = new ObjectQuery("SELECT * FROM Win32_USBHub");
+        List<USBClass.DeviceProperties> ListOfUSBDeviceProperties = new List<USBClass.DeviceProperties>();
+        Dictionary<uint, List<uint>> sd_di = new Dictionary<uint, List<uint>>();
+        Dictionary<uint, List<uint>> usb_di = new Dictionary<uint, List<uint>>();
         JObject result = new JObject();
 
         public usb()
         {
+            //AllocConsole();
             //this.WindowState = System.Windows.Forms.FormWindowState.Normal;
             result["result"] = false;
             var jsonconfig = GetFullPath("config.json");
@@ -44,6 +63,7 @@ namespace usb
             dynamic jobject = JObject.Parse(File.ReadAllText(jsonconfig));
             USBDevice = (int)jobject.USBDevice;
             SDDevice = (int)jobject.SDDevice;
+            DockingUsbDevice = (int)jobject.DockingUsbDevice;
             EnableUsbTransferTest = (int)jobject.EnableUsbTransferTest;
             ShowWindow = (bool)jobject.ShowWindow;
             InitializeComponent();
@@ -119,6 +139,77 @@ namespace usb
             if (File.Exists(SourceFileName)) File.Delete(SourceFileName);
             return IsRemovableTransferred;
         }
+
+        void RecordHubPort(string deviceid, Device device)
+        {
+            uint hubnumber = 0;
+            uint portnumber = 0;
+            var hubstring = "Hub_#";
+            var portstring = "Port_#";
+            var serialnumber = GetSerialNumber(deviceid);
+            var tuple = GetVidPid(serialnumber);
+            var vid = tuple.Item1;
+            var pid = tuple.Item2;
+
+            ListOfUSBDeviceProperties.Clear();
+            USBClass.GetUSBDevice(vid, pid, ref ListOfUSBDeviceProperties, true);
+            var location = ListOfUSBDeviceProperties.FirstOrDefault().DeviceLocation;
+
+            if (location.IndexOf(hubstring) != -1)
+                hubnumber = Convert.ToUInt32(location.Substring(location.IndexOf(hubstring) + hubstring.Length, 4));
+
+            if (location.IndexOf(portstring) != -1)
+                portnumber = Convert.ToUInt32(location.Substring(location.IndexOf(portstring) + portstring.Length, 4));
+
+            if (device == Device.SDCard)
+            {
+                if (sd_di.ContainsKey(hubnumber))
+                    sd_di[hubnumber].Add(portnumber);
+                else
+                    sd_di.Add(hubnumber, new List<uint> { portnumber });
+            }
+            else if(device == Device.USB)
+            {
+                if (usb_di.ContainsKey(hubnumber))
+                    usb_di[hubnumber].Add(portnumber);
+                else
+                    usb_di.Add(hubnumber, new List<uint> { portnumber });
+            }
+        }
+
+        Tuple<uint, uint> GetVidPid(string serialnumber)
+        {
+            uint vid = 0;
+            uint pid = 0;
+            var vidstring = "VID_";
+            var pidstring = "PID_";
+
+            ManagementObjectSearcher oSearcher = new ManagementObjectSearcher(ScopeCIMV2, queryUsbHub);
+            foreach (ManagementObject oResult in oSearcher.Get())
+            {
+                if (oResult["DeviceID"] == null)
+                    continue;
+
+                var DeviceID = oResult["DeviceID"].ToString();
+                string[] Token = DeviceID.Split(new char[] { '\\' });
+                if (serialnumber != Token[Token.Length - 1])
+                    continue;
+
+                if (DeviceID.IndexOf(vidstring) != -1)
+                    vid = Convert.ToUInt32(DeviceID.Substring(DeviceID.IndexOf(vidstring) + vidstring.Length, 4), 16);
+
+                if (DeviceID.IndexOf(vidstring) != -1)
+                    pid = Convert.ToUInt32(DeviceID.Substring(DeviceID.IndexOf(pidstring) + pidstring.Length, 4), 16);
+            }
+
+            return Tuple.Create(vid, pid);
+        }
+        string GetSerialNumber(string deviceid)
+        {
+            string[] Token = deviceid.Split(new char[] { '\\', '&' });
+            return Token[Token.Length - 2];
+        }
+
         private Boolean USBFlashTest()
         {
             txtUSBDetails.Clear(); // txtUSBDetails.Text = String.Empty;
@@ -138,19 +229,34 @@ namespace usb
                     // 公司內建的讀卡機在DeviceID都是以GENERIC開頭
                     if (eachDevice["DeviceID"].ToString().Contains("DISK") && eachDevice["DeviceID"].ToString().Contains("GENERIC") && eachDevice["Description"].ToString().Contains("Disk drive"))
                     {
+                        RecordHubPort(eachDevice["DeviceID"].ToString(), Device.SDCard);
                         txtUSBDetails.Text = txtUSBDetails.Text + "SD  Name : " + eachDevice["Name"].ToString() + Environment.NewLine;
                         if (IsDebugMode) Trace.WriteLine("SD  Name : " + eachDevice["Name"].ToString().PadRight(35, ' ') + "\t Status : " + eachDevice["Status"] + "\t DeviceID : " + eachDevice["DeviceID"] + Environment.NewLine);
-                        ExistingSDCard++;
                     }
                     // USB 隨身碟 (需要過濾Portable Device Enumerator (WPDBusEnum))
                     else if (eachDevice["Name"].ToString().Contains("USB") && eachDevice["PNPDeviceID"].ToString().Contains("USBSTOR") && !eachDevice["PNPDeviceID"].ToString().Contains("SWD\\WPDBUSENUM"))
                     {
+                        RealExistingRemovableDevice++;
+                        RecordHubPort(eachDevice["DeviceID"].ToString(), Device.USB);
                         txtUSBDetails.Text = txtUSBDetails.Text + "USB Name : " + eachDevice["Name"].ToString() + Environment.NewLine;
                         if (IsDebugMode) Trace.WriteLine("USB Name : " + eachDevice["Name"].ToString().PadRight(35, ' ') + "\t Status : " + eachDevice["Status"] + "\t DeviceID : " + eachDevice["DeviceID"] + Environment.NewLine);
-                        ExistingRemovableDevice++;
                     }
                 }
             }
+
+            foreach (var v in sd_di)
+            {
+                if (SDDevice != ExistingSDCard)
+                    ExistingSDCard++;
+                Trace.WriteLine(string.Format("Hub {0} contains {1} sdcard", v.Key, v.Value.Count()));
+            }
+
+            foreach (var v in usb_di)
+            {
+                ExistingRemovableDevice++;
+                Trace.WriteLine(string.Format("Hub {0} contains {1} usb storag", v.Key, v.Value.Count()));
+            }
+
             if (ExistingSDCard.Equals(0) && ExistingRemovableDevice.Equals(0)) UpdateUSBDeviceDetails("Can't Get List of connected USB Devices.");
             #endregion
 
@@ -158,13 +264,16 @@ namespace usb
 
             #region 利用foreach迴圈取得磁碟類型常數, 包括 CDRom、Fixed、Network、NoRootDirectory、Ram、Removable 和 Unknown
             var LogicalDrives = DriveInfo.GetDrives();
+            var index = 0;
             foreach (var mLogicalDrive in LogicalDrives)
             { // IsReady 指出磁碟是否就緒. 例如, 指出光碟機中是否有光碟片, 或是抽取式儲存裝置是否已就緒, 可進行讀取/寫入作業. 
-                if (mLogicalDrive.IsReady == true)
+                if (mLogicalDrive.IsReady == true && mLogicalDrive.DriveType.Equals(DriveType.Removable))
                 {
                     if (IsDebugMode)
                     {
-                        USBFlash[ExistingRemovableDevice] = mLogicalDrive.ToString();
+                        if (index <= RealExistingRemovableDevice + SDDevice)
+                            USBFlash[index] = mLogicalDrive.ToString();
+
                         txtUSBDetails.Text = Environment.NewLine + txtUSBDetails.Text + "Drive : " + mLogicalDrive.ToString() + Environment.NewLine;
                         txtUSBDetails.Text = txtUSBDetails.Text + "Drive Type : " + mLogicalDrive.DriveType + Environment.NewLine;
                         txtUSBDetails.Text = txtUSBDetails.Text + "Volume label : " + mLogicalDrive.VolumeLabel + Environment.NewLine;
@@ -173,6 +282,7 @@ namespace usb
                         // txtUSBDetails.Text = txtUSBDetails.Text + "Total available space : " + FormatBytesToHumanReadable(mLogicalDrive.AvailableFreeSpace) + Environment.NewLine;
                         txtUSBDetails.Text = txtUSBDetails.Text + "Total size of drive : " + FormatBytesToHumanReadable(mLogicalDrive.TotalSize) + Environment.NewLine;
                         if (IsDebugMode) UpdateUSBDeviceDetails(Environment.NewLine + string.Empty.PadRight(40, '=') + Environment.NewLine);
+                        index++;
                     }
                 }
                 else txtUSBDetails.Text = txtUSBDetails.Text + "The device is not ready." + Environment.NewLine;
@@ -182,9 +292,9 @@ namespace usb
             labelExistingRemovableDevice.Text = ExistingRemovableDevice.ToString();
             labelExistingSDCard.Text = ExistingSDCard.ToString();
 
-            if ((ExistingRemovableDevice + ExistingSDCard) >= (USBDevice + SDDevice)) // Handheld主機板基本上都有兩個USB孔, 要確保每個USB孔上面都有插入USB裝置. 如果有SD卡, 那需要偵測的Removable裝置多一個. 
+            if ((ExistingRemovableDevice + ExistingSDCard) >= (USBDevice + SDDevice + DockingUsbDevice)) // Handheld主機板基本上都有兩個USB孔, 要確保每個USB孔上面都有插入USB裝置. 如果有SD卡, 那需要偵測的Removable裝置多一個. 
             {
-                UpdateUSBDeviceDetails("Device : " + (ExistingRemovableDevice + ExistingSDCard) + " >= (USB : " + USBDevice + " + SD : " + SDDevice + ")");
+                UpdateUSBDeviceDetails("Device : " + (ExistingRemovableDevice + ExistingSDCard) + " >= (USB : " + USBDevice + "+ DockingUSB : " + DockingUsbDevice + " + SD : " + SDDevice + ")");
 
                 if (HasMemoryCardSlot() && ExistingSDCard.Equals(0))
                 {
@@ -193,9 +303,10 @@ namespace usb
                 else if (EnableUsbTransferTest.Equals(1))
                 {
                     #region 在Removable裝置的根目錄, 新增一個測試檔案
-                    for (int k = 1; k <= ExistingRemovableDevice; k++)
+                    for (int k = 0; k < RealExistingRemovableDevice + SDDevice; k++)
                     {
-                        SourceFileName = USBFlash[k] + "WinmateUSBTest.txt"; // 在裝置的根目錄, 新增一個測試檔案
+                        SourceFileName = Path.Combine(USBFlash[k] + "WinmateUSBTest.txt"); // 在裝置的根目錄, 新增一個測試檔案
+                        Trace.WriteLine(SourceFileName);
                         UpdateUSBDeviceDetails("Path to USB test file : " + SourceFileName);
                         try
                         {
@@ -210,7 +321,7 @@ namespace usb
                         }
                     }
                     //IsRemovableTransferred = 0; // 回復初始值, 不然Retry的時候會出現數值沒有清除直接累加的錯誤
-                    if (IsRemovableTransferred.Equals(ExistingRemovableDevice)) checkTestStatus("PASS");
+                    if (IsRemovableTransferred.Equals(RealExistingRemovableDevice + SDDevice)) checkTestStatus("PASS");
                     else
                     {
                         checkTestStatus("FAIL");
@@ -239,7 +350,7 @@ namespace usb
         private bool CanNotFindDevicesForAllSlots()
         {
             checkTestStatus("Plug devices into all slots");
-            if (ExistingRemovableDevice.Equals(USBDevice)) labelUSBResult.Text = "OK.";
+            if (ExistingRemovableDevice.Equals(USBDevice + DockingUsbDevice)) labelUSBResult.Text = "OK.";
             else labelUSBResult.Text = "Plug device into USB slot.";
             if (HasMemoryCardSlot() && ExistingSDCard.Equals(0)) labelSDResult.Text = "Plug device into SD slot.";
             else if (HasMemoryCardSlot() && ExistingSDCard.Equals(0)) labelSDResult.Text = "OK.";

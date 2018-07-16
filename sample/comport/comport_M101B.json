@@ -1,0 +1,8 @@
+{
+  "name": "comport_m101b",
+  "SerialPortCount": 1,
+  "DockingSerialPortCount": 1,
+  "SerialPort":["COM1"],
+  "DockingSerialPort":["COM11"],
+  "ShowWindow": false,
+}

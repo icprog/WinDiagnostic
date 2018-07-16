@@ -50,14 +50,18 @@ namespace usb
 
         public usb()
         {
+            InitializeComponent();
+        }
+
+        private void usb_Load(object sender, EventArgs e)
+        {
             //AllocConsole();
-            //this.WindowState = System.Windows.Forms.FormWindowState.Normal;
             result["result"] = false;
             var jsonconfig = GetFullPath("config.json");
             if (!File.Exists(jsonconfig))
             {
                 MessageBox.Show("config.json not founded");
-                Application.Exit();
+                Environment.Exit(0);
             }
 
             dynamic jobject = JObject.Parse(File.ReadAllText(jsonconfig));
@@ -66,13 +70,9 @@ namespace usb
             DockingUsbDevice = (int)jobject.DockingUsbDevice;
             EnableUsbTransferTest = (int)jobject.EnableUsbTransferTest;
             ShowWindow = (bool)jobject.ShowWindow;
-            InitializeComponent();
-        }
 
-        private void usb_Load(object sender, EventArgs e)
-        {
             if (ShowWindow)
-                this.WindowState = System.Windows.Forms.FormWindowState.Normal;
+                this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
 
             if (IsDebugMode) Trace.WriteLine("USB_Load");
 
@@ -82,7 +82,7 @@ namespace usb
             Thread.Sleep(200);
             File.Create(GetFullPath("completed"));
             if (!ShowWindow)
-                Application.Exit();
+                Environment.Exit(0);
         }
         private bool HasMemoryCardSlot()
         {

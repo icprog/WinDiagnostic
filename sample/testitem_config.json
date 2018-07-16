@@ -4,7 +4,7 @@
   "items": [ "automatic" ],
   "automatic": {
     "name": "Automatic",
-    "items": [ "AUDIO","USB"],
+    "items": [ "AUDIO","USB","COMPORT"],
     "AUDIO": {
       "name": "Audio",
       "path": "audio",
@@ -13,6 +13,11 @@
 	  "USB": {
       "name": "USB",
       "path": "usb",
+      "timeout": 120
+    },
+	  "COMPORT": {
+      "name": "COMPORT",
+      "path": "comport",
       "timeout": 120
     }
   }

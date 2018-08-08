@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "comport", "..\comport\compo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "bluetooth", "..\bluetooth\bluetooth\bluetooth.csproj", "{9004C26B-39D8-4538-8F7D-77DC05552F94}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "wifi", "..\wifi\wifi\wifi.csproj", "{94E4A8A2-658E-445F-861E-BB8C59D96B48}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{9004C26B-39D8-4538-8F7D-77DC05552F94}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9004C26B-39D8-4538-8F7D-77DC05552F94}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9004C26B-39D8-4538-8F7D-77DC05552F94}.Release|Any CPU.Build.0 = Release|Any CPU
+		{94E4A8A2-658E-445F-861E-BB8C59D96B48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{94E4A8A2-658E-445F-861E-BB8C59D96B48}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{94E4A8A2-658E-445F-861E-BB8C59D96B48}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{94E4A8A2-658E-445F-861E-BB8C59D96B48}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

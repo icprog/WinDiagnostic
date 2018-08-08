@@ -1,4 +1,17 @@
 {
   "name": "wifi_m101b",
-  "power pin": 23
+  "SNRTolerance": 80,
+  "WiFiScanTime": 3,
+  "DelayWiFiTestTime": 3000,
+  "PingIntervalWiFi": 2000,
+  "PingSuccessRate" : 0.9,
+  "TotalPingCount" : 50,
+  "PingAddressWiFi": ["www.winmate","www.winmate"],
+  "EnableAuthentication": [false,false],
+  "SSID": ["WinmateTest","WinmateTest-5GHz"],
+  "Password": ["",""],
+  "Authentication": ["open","open"],
+  "Encryption": ["none","none"],
+  "KeyType": ["",""],
+  "ShowWindow": false
 }

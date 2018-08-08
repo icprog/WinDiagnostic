@@ -4,7 +4,7 @@
   "items": [ "automatic" ],
   "automatic": {
     "name": "Automatic",
-    "items": [ "AUDIO","USB","COMPORT","BLUETOOTH"],
+    "items": [ "AUDIO","USB","COMPORT","BLUETOOTH","WIFI"],
     "AUDIO": {
       "name": "Audio",
       "path": "audio",
@@ -23,6 +23,11 @@
 	  "BLUETOOTH": {
       "name": "BLUETOOTH",
       "path": "bluetooth",
+      "timeout": 120
+    },
+	  "WIFI": {
+      "name": "WiFi",
+      "path": "wifi",
       "timeout": 120
     }
   }

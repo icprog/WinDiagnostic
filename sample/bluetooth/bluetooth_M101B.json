@@ -2,5 +2,5 @@
   "name": "bluetooth_m101b",
   "EnableFileTransfer": false,
   "EnablePlayAudio":false,
-  "ShowWindow": true,
+  "ShowWindow": false,
 }

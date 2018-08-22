@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "wifi", "..\wifi\wifi\wifi.c
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lan", "..\lan\lan\lan.csproj", "{AAF19080-36B7-4B1A-95D5-7A21A0C8A7B1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "camera", "..\camera\camera\camera.csproj", "{29C32A9B-6CC7-462C-B833-DAFC977092FE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,10 @@ Global
 		{AAF19080-36B7-4B1A-95D5-7A21A0C8A7B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AAF19080-36B7-4B1A-95D5-7A21A0C8A7B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AAF19080-36B7-4B1A-95D5-7A21A0C8A7B1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{29C32A9B-6CC7-462C-B833-DAFC977092FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{29C32A9B-6CC7-462C-B833-DAFC977092FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{29C32A9B-6CC7-462C-B833-DAFC977092FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{29C32A9B-6CC7-462C-B833-DAFC977092FE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

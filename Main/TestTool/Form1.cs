@@ -21,6 +21,7 @@ namespace TestTool
         Thread thread_test;
         JObject js_result = new JObject();
         List<TreeNode> list_treenode_items = new List<TreeNode>();
+        bool DeleteComplete = false;
 
         public Form1()
         {
@@ -111,7 +112,7 @@ namespace TestTool
                 btn_start.Text = "Stop";
                 thread_test = new Thread(new ParameterizedThreadStart(TestThread));
                 thread_test.Start(jsobj);
-
+                DeleteComplete = true;
             }
             else
             {
@@ -150,8 +151,8 @@ namespace TestTool
                         foreach (TreeNode node in list_treenode_items)
                         {
                             //if (node.Text.Contains("PASS") || node.Text.Contains("FAIL"))
-                            if (node.ForeColor == Color.Green || node.ForeColor == Color.Red)
-                                continue;
+                            //if (node.ForeColor == Color.Green || node.ForeColor == Color.Red)
+                            //    continue;
                             int r = isfailed(node.Name);
                             if (r == -1)
                             {
@@ -161,6 +162,8 @@ namespace TestTool
                             else
                                 ShowStatus(node, r);
                         }
+
+                        DeleteComplete = false;
                         Thread.Sleep(3000);
                     }
                 }
@@ -218,17 +221,29 @@ namespace TestTool
         private int isfailed(string item)
         {
             string strFile = item + "\\completed";
+            string jsonFile = item + "\\result.json";
+
+            if (DeleteComplete)
+            {
+                if (File.Exists(strFile))
+                    File.Delete(strFile);
+
+                if (File.Exists(jsonFile))
+                    File.Delete(jsonFile);
+            }
+
             if (!File.Exists(strFile))
             {
                 return -1;
             }
-            strFile = item + "\\result.json";
-            if (!File.Exists(strFile))
+
+            if (!File.Exists(jsonFile))
             {
                 return -1;
-            }
+            }            
+
             JObject j = new JObject();
-            j.Add(item, JObject.Parse(File.ReadAllText(strFile)));
+            j.Add(item, JObject.Parse(File.ReadAllText(jsonFile)));
             js_result.Merge(j, new JsonMergeSettings { MergeArrayHandling = MergeArrayHandling.Union });
             if ((bool)j[item]["result"] == true)
                 return 1;

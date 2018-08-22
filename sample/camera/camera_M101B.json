@@ -1,0 +1,10 @@
+{
+  "name": "camera_m101b",
+  "CameraAmount": 2,
+  "IsAutoModeCamera": true,
+  "IsFM08": false,
+  "TimerIntervalCamaraCapture": 5000,
+  "ConfirmTagContextBarcode": "071589812308",
+  "TestProduct": "IB80",
+  "ShowWindow": false
+}

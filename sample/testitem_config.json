@@ -4,7 +4,7 @@
   "items": [ "automatic" ],
   "automatic": {
     "name": "Automatic",
-    "items": [ "AUDIO","USB","COMPORT","BLUETOOTH","WIFI"],
+    "items": [ "AUDIO","USB","COMPORT","BLUETOOTH","CAMERA","NETWORK"],
     "AUDIO": {
       "name": "Audio",
       "path": "audio",
@@ -25,10 +25,23 @@
       "path": "bluetooth",
       "timeout": 120
     },
-	  "WIFI": {
+	  "CAMERA": {
+      "name": "CAMERA",
+      "path": "camera",
+      "timeout": 120
+    },
+	  "NETWORK": {
+	  "items": [ "WiFi","Lan"],
+      "WiFi": {
       "name": "WiFi",
       "path": "wifi",
       "timeout": 120
+	  },
+	  "Lan": {
+      "name": "Lan",
+      "path": "lan",
+      "timeout": 120
+      }
     }
   }
 }

@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using SimpleWifi;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,6 +14,7 @@ using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace wifi
@@ -30,28 +32,18 @@ namespace wifi
 
         System.Windows.Forms.Timer TimerWifiTest = new System.Windows.Forms.Timer();
         bool IsDebugMode = true;
-        private bool IsWiFiScanned = false;  // 判斷是否有在範圍內找到欲連線的SSID
-        private bool IsWiFi24gPassed = false;// 2.4G頻段是否已經測試完畢
-        private int WiFiScanCount = 1;          // 進行WIFI連線前必須先掃描5次, 計算SSID的平均SNR強度
-        private int WiFiSignal = 0;             // 已連線的WiFi訊號強度
-        private int WiFiSignalAvg = 0;          // 用來計算WiFi訊號平均強度
+        bool IsWiFiScanned = false;  // 判斷是否有在範圍內找到欲連線的SSID
+        bool IsWiFi24gPassed = false;// 2.4G頻段是否已經測試完畢
+        int WiFiScanCount = 1;          // 進行WIFI連線前必須先掃描5次, 計算SSID的平均SNR強度
+        int WiFiSignalAvg = 0;          // 用來計算WiFi訊號平均強度
         // 測試WIFI重複連線測試穩定度用
-        private int LoopCount = 0; // 預設跑100次迴圈測試
-        private int PassCount = 0;
-        private int FailCount = 0;
+        int LoopCount = 0; // 預設跑100次迴圈測試
+        int PassCount = 0;
+        int FailCount = 0;
         int TotalPingCountWiFi = 50;                    // 嘗試PING到遠端主機的次數
         double ConnectNetToleranceWiFi = 0.9;           // Ping連線時成功機率的最低容忍值
         int PingIntervalWiFi = 1000;                    // 每次Ping所等待回應的最大時間
         int SNRToleranceWiFi = 65;                      // 連線WIFI訊號強度的最低容忍值
-        //bool EnableAuthentication = false;              // 用來判斷要用哪一種Wireless Profile(有無密碼)
-        //string connectWiFiSSID = "WinmateTest";         // SSID
-        //string connectWiFiSSID24G = "WinmateTest";
-        //string connectWiFiSSID5G = "WinmateTest-5GHz";
-        //string connectWiFiPassword = "";                // SSID密碼  // "5296930209";// "0933214371";
-        //string connectWiFiAuthentication = "open";      // SSID使用的驗證類型, open/WPA/WPA2
-        //string connectWiFiEncryption = "none";          // SSID使用的加密類型, WEP/TKIP/AES
-        //string connectWiFiKeyType = "";                 // SSID的KeyType, networkKey/passPhrase
-        string WifiProfile = "";                        // 儲存WIFI用以連線的SSID XML設定檔格式
         int DelayWiFiTestTime = 1000;                     // 當送出WIFI連線指令後, 要延遲多少秒後才開始進行WIFI連線測試?
         int isLoopTestWiFi = 0;                         // 是否要開啟迴圈測試? 開啟之後會連續測試100次網路
         int isConnectTestWiFi = 1;
@@ -59,8 +51,6 @@ namespace wifi
         bool IsTestWiFiTwoBands = false;                //是否要同時測試WIFI 2.4G跟5G的兩個頻段
         Ping mPingTester;                         // 可以讓應用程式判斷是否能透過網路存取遠端電腦. 
         PingReply mPingReply;                     // 儲存由 Ping.Send 或 Ping.SendAsync而產生的狀態和資料等相關資訊
-                                                  // public string who = "192.168.100.46";
-                                                  //string PingAddressWiFi = "192.168.100.46";    // Ping的連線位置
         static string pingData = "TestWinmatePingTestWinmatePingTestWinmatePingTestWinmatePingTest";
         byte[] pingBuffer = Encoding.ASCII.GetBytes(pingData);
         PingOptions pingOptions = new PingOptions(64, true);
@@ -76,15 +66,12 @@ namespace wifi
         List<string> WiFiSSIDList;
         List<string> PingAddressList;
         List<string> WiFiPasswordList;
-        List<string> WiFiAuthenticationList;
-        List<string> WiFiEncryptionList;
-        List<string> WiFiKeyTypeList;
-        List<bool> EnableAuthenticationList;
         List<bool> IsWiFiPassedList;
+        List<AccessPoint> ScanWiFiList;
         int WiFiTestCount = 0;
+        Wifi Wifi = null;
+        AccessPoint ConnectAccessPoint = null;
         #endregion
-
-
 
         public wifi()
         {
@@ -97,7 +84,7 @@ namespace wifi
             return Path.Combine(exepath, path);
         }
 
-        private void wifi_Load(object sender, EventArgs e)
+        void wifi_Load(object sender, EventArgs e)
         {
             result["result"] = false;
             var jsonconfig = GetFullPath("config.json");
@@ -113,23 +100,22 @@ namespace wifi
             ConnectNetToleranceWiFi = (double)jobject.PingSuccessRate;
             TotalPingCountWiFi = (int)jobject.TotalPingCount;
             WiFiScanTime = (int)jobject.WiFiScanTime;
-            DelayWiFiTestTime = (int)jobject.DelayWiFiTestTime;
             PingIntervalWiFi = (int)jobject.PingIntervalWiFi;
             PingAddressList = jobject.PingAddressWiFi.ToObject<List<string>>();
-            EnableAuthenticationList = jobject.EnableAuthentication.ToObject<List<bool>>();
             WiFiSSIDList = jobject.SSID.ToObject<List<string>>();
             WiFiPasswordList = jobject.Password.ToObject<List<string>>();
-            WiFiAuthenticationList = jobject.Authentication.ToObject<List<string>>();
-            WiFiEncryptionList = jobject.Encryption.ToObject<List<string>>();
-            WiFiKeyTypeList = jobject.KeyType.ToObject<List<string>>();
             IsWiFiPassedList = new List<bool>();
             IsWiFiPassedList.AddRange(Enumerable.Repeat(false, WiFiSSIDList.Count()));
 
             if (ShowWindow)
-                this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+            {
+                this.Opacity = 100;
+                this.ShowInTaskbar = true;
+            }
 
             if (IsDebugMode) Trace.WriteLine("WiFi_Load");
 
+            Wifi = new Wifi();
             DisconnectNetwork();
             #region Prepare Timer
             TimerWifiTest.Tick += new EventHandler(TimerWifiTest_Tick);
@@ -148,7 +134,7 @@ namespace wifi
             }
         }
 
-        private void TimerWifiTest_Tick(object sender, EventArgs e)
+        void TimerWifiTest_Tick(object sender, EventArgs e)
         {
             try
             {
@@ -163,88 +149,44 @@ namespace wifi
 
         public void DisconnectNetwork()
         {
-            DisconnectWiFi();
-        }
+            Wifi.Disconnect();
+            ScanWiFiList = Wifi.GetAccessPoints();
+            ScanWiFiList.ForEach(e => e.DeleteProfile());
+        }        
 
-        public void DisconnectWiFi()
+        public Task<bool> ConnectWiFiSSID(string Password)
         {
-            DisconnectWireless("netsh", "wlan disconnect interface = *");
-            DisconnectWireless("netsh", "wlan delete name=*");
-        }
-
-        public void DisconnectWireless(string FileName, string Arguments)
-        {
-            using (Process mProcess = new Process()) // Process用來呼叫外部程式
+            var tcs = new TaskCompletionSource<bool>();
+            AuthRequest authRequest = new AuthRequest(ConnectAccessPoint);
+            bool overwrite = true;
+            if (authRequest.IsPasswordRequired)
             {
-                if (IsDebugMode)
+                if (ConnectAccessPoint.HasProfile)
+                // If there already is a stored profile for the network, we can either use it or overwrite it with a new password.
                 {
-                    Trace.WriteLine("Disconnect Wireless Network. cmd : " + Arguments + " " + DateTime.Now);
+                    overwrite = false;
                 }
-                mProcess.StartInfo.CreateNoWindow = true; // 不顯示CMD的執行視窗
-                mProcess.StartInfo.FileName = FileName; // 呼叫netsh
-                mProcess.StartInfo.Arguments = Arguments;
-                mProcess.StartInfo.RedirectStandardOutput = true;// 取得或設定值, 指出應用程式的輸出是否寫入至 Process.StandardOutput 資料流. 
-                mProcess.StartInfo.UseShellExecute = false; // 取得或設定值, 指出是否要使用作業系統 Shell 來啟動處理序. 
-                mProcess.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                mProcess.Start();
-                if (IsDebugMode)
+
+                if (overwrite)
                 {
-                    Trace.WriteLine("Disconnect Wireless Network. Result = " + mProcess.StandardOutput.ReadToEnd() + DateTime.Now);
+                    authRequest.Password = Password;
+
+                    //if (authRequest.IsUsernameRequired)
+                    //{
+                    //    Console.Write("\r\nPlease enter a username: ");
+                    //    authRequest.Username = Console.ReadLine();
+                    //}
+
+                    //if (authRequest.IsDomainSupported)
+                    //{
+                    //    Console.Write("\r\nPlease enter a domain: ");
+                    //    authRequest.Domain = Console.ReadLine();
+                    //}
                 }
-                mProcess.WaitForExit();
-            }
-        }
-
-        public void ConnectWiFiSSID(string SSID, string Password, string Authentication, string Encryption, string KeyType)
-        {
-            string command = string.Empty;
-
-            if (EnableAuthenticationList[WiFiTestCount])
-            {
-                WifiProfile = string.Format("<?xml version=\"1.0\"?><WLANProfile xmlns=\"http://www.microsoft.com/networking/WLAN/profile/v1\"><name>" + SSID + "</name><SSIDConfig><SSID><name>" + SSID + "</name></SSID></SSIDConfig><connectionType>ESS</connectionType><MSM><security><authEncryption><authentication>" + Authentication + "</authentication><encryption>" + Encryption + "</encryption><useOneX>false</useOneX></authEncryption><sharedKey><keyType>" + KeyType + "</keyType><protected>false</protected><keyMaterial>" + Password + "</keyMaterial></sharedKey><keyIndex>0</keyIndex></security></MSM></WLANProfile>");
-            }
-            else
-            {
-                WifiProfile = string.Format("<?xml version=\"1.0\"?><WLANProfile xmlns=\"http://www.microsoft.com/networking/WLAN/profile/v1\"><name>" + SSID + "</name><SSIDConfig><SSID><name>" + SSID + "</name></SSID></SSIDConfig><connectionType>ESS</connectionType><MSM><security><authEncryption><authentication>" + Authentication + "</authentication><encryption>" + Encryption + "</encryption><useOneX>false</useOneX></authEncryption></security></MSM></WLANProfile>");
             }
 
-            Trace.WriteLine("Wi-Fi Profile : " + WifiProfile);
-
-            StreamWriter wifiProfileWriter = new System.IO.StreamWriter(GetFullPath(WiFiSSIDList[WiFiTestCount] + ".xml"));
-            wifiProfileWriter.WriteLine(WifiProfile);
-            wifiProfileWriter.Close();
-
-            Process WiFiConnect = new Process();
-            WiFiConnect.StartInfo.CreateNoWindow = true;
-            WiFiConnect.StartInfo.RedirectStandardInput = true;
-            WiFiConnect.StartInfo.FileName = "cmd.exe";
-            if (SSID.IndexOf(' ') != -1)
-            {
-                command = string.Format("netsh wlan add profile filename ={0}", Path.Combine(Application.StartupPath, "TestWifi.xml"));
-            }
-            else
-            {
-                command = string.Format("netsh wlan add profile filename ={0}", Path.Combine(Application.StartupPath, WiFiSSIDList[WiFiTestCount] + ".xml"));
-            }
-
-            Trace.WriteLine("Wi-Fi Connect Info : " + WiFiConnect.StartInfo.Arguments);
-            WiFiConnect.StartInfo.RedirectStandardOutput = true;// 取得或設定值，指出應用程式的輸出是否寫入至 Process.StandardOutput 資料流。
-            WiFiConnect.StartInfo.UseShellExecute = false; // 取得或設定值，指出是否要使用作業系統 Shell 來啟動處理序。
-            WiFiConnect.Start();
-            using (var sw = new StreamWriter(WiFiConnect.StandardInput.BaseStream))
-            {
-                Trace.WriteLine(command);
-                sw.WriteLine(command);
-                command = string.Format("netsh wlan connect name={0}", WiFiSSIDList[WiFiTestCount]);
-                Trace.WriteLine(command);
-                sw.WriteLine(command);
-            }
-            WiFiConnect.WaitForExit();
-
-            if (IsDebugMode)
-            {
-                Trace.WriteLine("Connect to Wi-Fi. " + DateTime.Now);
-            }
+            ConnectAccessPoint.ConnectAsync(authRequest, overwrite, e => tcs.TrySetResult(e));
+            return tcs.Task;
         }
 
         string DoGetHostEntry(string hostname)
@@ -290,10 +232,10 @@ namespace wifi
                         {
                             command = string.Format("route change 0.0.0.0 mask 0.0.0.0 {0} metric {1} if {2}", gateway, metric, interfaceindex);
                         }
-                        Console.WriteLine(command);
+                        Trace.WriteLine(command);
                         sw.WriteLine(command);
                         command = string.Format("route delete 192.168.0.0");
-                        Console.WriteLine(command);
+                        Trace.WriteLine(command);
                         sw.WriteLine(command);
                         command = string.Format("route delete 192.168.120.0");
                         sw.WriteLine(command);
@@ -305,7 +247,7 @@ namespace wifi
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                Trace.WriteLine(ex);
                 return false;
             }
         }
@@ -371,12 +313,8 @@ namespace wifi
                 else
                 {
                     UpdateUI("WIFI is trying to connect... " + DateTime.Now);
-
-                    ConnectWiFiSSID(WiFiSSIDList[WiFiTestCount], WiFiPasswordList[WiFiTestCount], WiFiAuthenticationList[WiFiTestCount], WiFiEncryptionList[WiFiTestCount], WiFiKeyTypeList[WiFiTestCount]);
-
-                    Thread.Sleep(DelayWiFiTestTime);
+                    ConnectWiFiSSID(WiFiPasswordList[WiFiTestCount]).Wait();
                     UpdateUI("WIFI connectivity testing... " + DateTime.Now);
-
                     tryConnectNetCount = 0;
                     PingStatusSuccess = 0;
 
@@ -391,7 +329,8 @@ namespace wifi
                         GetNetworkInformation(NetworkInterfaceType.Ethernet);
                         for (int i = 0; i < EthernetGateway.Count(); i++)
                             SetRouteTable(EthernetGateway[i], EthernetInterface[i], 1, Operation.Delete);
-                        Thread.Sleep(DelayWiFiTestTime);
+
+                        Thread.Sleep(50);
                         mPingTester.SendAsync(PingAddressList[WiFiTestCount], PingIntervalWiFi, pingBuffer, null); // 開啟一個Thread來Ping遠程主機
                     }
                 }
@@ -425,185 +364,20 @@ namespace wifi
             File.WriteAllLines(hostFile, File.ReadAllLines(hostFile).Where(e => !e.Contains(hostname)));
         }
 
-        private void ScanWiFiSSID()
+        void ScanWiFiSSID()
         {
-            #region Variable
-            string NetshOutput, WlanData;
-            string[,] Networks = new string[100, 9];
-            int BSSIDNumber = 0;
-            int NetworkIndex = -1;
-            int Signaldbm = -100;
-            #endregion
+            UpdateUI("Scan: " + WiFiScanCount);
+            ScanWiFiList = Wifi.GetAccessPoints();
 
-            using (Process proc = new Process()) //Process用來呼叫外部程式
+            if (ScanWiFiList.Any(e => e.Name.Contains(WiFiSSIDList[WiFiTestCount])))
             {
-                proc.StartInfo.CreateNoWindow = true; //不顯示CMD的執行視窗
-                proc.StartInfo.FileName = "netsh"; //呼叫netsh
-                proc.StartInfo.Arguments = "wlan show networks mode=bssid"; //需要netsh執行的指令參數
-                proc.StartInfo.RedirectStandardOutput = true;//取得或設定值，指出應用程式的輸出是否寫入至 Process.StandardOutput 資料流。
-                proc.StartInfo.UseShellExecute = false; //取得或設定值，指出是否要使用作業系統 Shell 來啟動處理序。
-                proc.Start();
-                NetshOutput = proc.StandardOutput.ReadToEnd(); //讀取從目前位置到資料流末端的所有字元。
-                proc.WaitForExit(); //設定要等待相關的處理序結束的時間，並且阻止目前的執行緒執行，直到等候時間耗盡或者處理序已經結束為止。
+                ConnectAccessPoint = ScanWiFiList.FindLast(e => string.Equals(e.Name, WiFiSSIDList[WiFiTestCount]));
+                var quality = ConnectAccessPoint.SignalStrength;
+                var dbm = (Convert.ToInt32(quality) / 2) - 100;
+                IsWiFiScanned = true;
+                WiFiSignalAvg = dbm;
+                UpdateUI("WIFI SSID: " + ConnectAccessPoint.Name + ", SNR : " + dbm.ToString() + " dbm");
             }
-
-            //if (IsDebugMode) Trace.WriteLine(NetshOutput); //一次將所有資料倒出來量會太大
-
-            if (NetshOutput.IndexOf("no wireless interface") >= 0)
-            {
-                TimerWifiTest.Stop();
-                checkTestStatus("No wireless interface");  // There is no wireless interface on the system.
-            }
-
-            #region Parse WIFI SSID data
-            StringReader netshOutputReader = new StringReader(NetshOutput.ToString());
-            while ((WlanData = netshOutputReader.ReadLine()) != null)
-            {
-                //if (IsDebugMode) Trace.WriteLine(WlanData);
-                if (WlanData.StartsWith("General Failure"))
-                {
-                    TimerWifiTest.Stop();
-                    checkTestStatus("Wifi not installed."); // Wifi disconnected or not installed
-                    break;
-                }
-                if (WlanData.StartsWith("SSID"))
-                {
-                    NetworkIndex++;
-                    for (int i = 0; i < 9; i++) Networks[NetworkIndex, i] = " "; // prevent exception finding null on search 
-                    Networks[NetworkIndex, 3] = "0%"; // prevent exception for trim
-                    BSSIDNumber = 0;// reset the BSSID number
-                    Networks[NetworkIndex, 1] = WlanData.Substring(WlanData.IndexOf(":") + 1).TrimEnd(' ').TrimStart(' ');
-                    continue;
-                }
-                if (WlanData.IndexOf("Network type") > 0 || WlanData.IndexOf("網路類型") > 0)
-                {
-                    if (WlanData.EndsWith("Infrastructure") || WlanData.IndexOf("基礎結構") > 0)
-                    {
-                        Networks[NetworkIndex, 7] = "AP";
-                        continue;
-                    }
-                    else Networks[NetworkIndex, 7] = WlanData.Substring(WlanData.IndexOf(":") + 1); //"Ad-hoc";
-                }
-                if (WlanData.IndexOf("Authentication") > 0 || WlanData.IndexOf("驗證") > 0)
-                {
-                    Networks[NetworkIndex, 4] = WlanData.Substring(WlanData.IndexOf(":") + 1).TrimStart(' ').TrimEnd(' ');
-                    continue;
-                }
-                if (WlanData.IndexOf("Encryption") > 0 || WlanData.IndexOf("加密") > 0)
-                {
-                    Networks[NetworkIndex, 5] = WlanData.Substring(WlanData.IndexOf(":") + 1).TrimStart(' ').TrimEnd(' ');
-                    continue;
-                }
-                if (WlanData.IndexOf("BSSID") > 0)
-                {
-                    if ((Convert.ToInt32(WlanData.IndexOf("BSSID" + 6)) > BSSIDNumber))
-                    {
-                        BSSIDNumber = Convert.ToInt32(WlanData.IndexOf("BSSID" + 6));
-                        NetworkIndex++;
-                        Networks[NetworkIndex, 1] = Networks[NetworkIndex - 1, 1]; // same SSID 
-                        Networks[NetworkIndex, 7] = Networks[NetworkIndex - 1, 7]; // same Network Type
-                        Networks[NetworkIndex, 4] = Networks[NetworkIndex - 1, 4]; // Same authorization
-                        Networks[NetworkIndex, 5] = Networks[NetworkIndex - 1, 5]; // same encryption
-                    }
-                    Networks[NetworkIndex, 0] = WlanData.Substring(WlanData.IndexOf(":") + 1);
-                    continue;
-                }
-                if (WlanData.IndexOf("Signal") > 0 || WlanData.IndexOf("訊號") > 0)
-                {
-                    Networks[NetworkIndex, 3] = WlanData.Substring(WlanData.IndexOf(":") + 1);
-                    continue;
-                }
-                if (WlanData.IndexOf("Radio Type") > 0 || WlanData.IndexOf("無線電波類型") > 0)
-                {
-                    Networks[NetworkIndex, 6] = WlanData.Substring(WlanData.IndexOf(":") + 1);
-                    continue;
-                }
-                if (WlanData.IndexOf("Channel") > 0 || WlanData.IndexOf("通道") > 0)
-                {
-                    Networks[NetworkIndex, 2] = WlanData.Substring(WlanData.IndexOf(":") + 1);
-                    continue;
-                }
-                if (WlanData.IndexOf("Basic Rates") > 0 || WlanData.IndexOf("基本速率") > 0)
-                {
-                    //Networks[NetworkIndex, 8] = line.Substring(line.Length - 2, 2);
-                    Networks[NetworkIndex, 8] = WlanData.Substring(WlanData.IndexOf(":"));
-                    if (Networks[NetworkIndex, 8] == ":") { Networks[NetworkIndex, 8] = "not shown"; continue; }
-                    Networks[NetworkIndex, 8] = Networks[NetworkIndex, 8].TrimStart(':').TrimStart(' ').TrimEnd(' ');
-                    for (int i = Networks[NetworkIndex, 8].Length - 1; i > 0; i--)
-                    {
-                        if (Networks[NetworkIndex, 8].Substring(i, 1) == " ")
-                        {
-                            Networks[NetworkIndex, 8] = Networks[NetworkIndex, 8].Substring(i + 1, Networks[NetworkIndex, 8].Length - 1 - i);
-                            break;
-                        }
-                    }
-                }
-                if (WlanData.IndexOf("Other Rates") > 0 || WlanData.IndexOf("其他速率") > 0)
-                {
-                    // overwrite the basic rates if this entry is present
-                    Networks[NetworkIndex, 8] = WlanData.Substring(WlanData.IndexOf(":"));
-                    if (Networks[NetworkIndex, 8] == ":") { Networks[NetworkIndex, 8] = "not shown"; continue; }
-                    Networks[NetworkIndex, 8] = Networks[NetworkIndex, 8].TrimStart(':').TrimStart(' ').TrimEnd(' ');
-                    for (int i = Networks[NetworkIndex, 8].Length - 1; i >= 0; i--)
-                    {
-                        if (Networks[NetworkIndex, 8].Substring(i, 1) == " ")
-                        {
-                            Networks[NetworkIndex, 8] = Networks[NetworkIndex, 8].Substring(i + 1, Networks[NetworkIndex, 8].Length - 1 - i);
-                            break;
-                        }
-                    }
-                }
-            }
-            #endregion
-            #region Update WIFI Status
-            listViewWifiStatus.Items.Clear(); // 先清除ListView所有資料再更新
-            for (int i = 0; i < listViewWifiStatus.Items.Count; i++)
-            {
-                // set signal to zero on all items in list
-                listViewWifiStatus.Items[i].SubItems[3].Text = "dbm";
-                listViewWifiStatus.Items[i].ImageIndex = 5;
-            }
-
-            for (int i = 0; i < NetworkIndex + 1; i++)
-            {
-                if (Networks[i, 0] == " ") continue; // Don't search if no valid MAC Address
-                SystemSounds.Hand.Play();// New discovery - add it to the list
-                listViewWifiStatus.Items.Add(Networks[i, 0]);                                                   // MAC Address
-                listViewWifiStatus.Items[listViewWifiStatus.Items.Count - 1].SubItems.Add(Networks[i, 1]);      // SSID
-                listViewWifiStatus.Items[listViewWifiStatus.Items.Count - 1].SubItems.Add(Networks[i, 2]);      // Channel
-                Signaldbm = Convert.ToInt32(Networks[i, 3].TrimEnd(' ').TrimEnd('%'));
-                Signaldbm = (Signaldbm / 2) - 100;
-                listViewWifiStatus.Items[listViewWifiStatus.Items.Count - 1].SubItems.Add(Signaldbm + " dbm");  // Signal
-                listViewWifiStatus.Items[listViewWifiStatus.Items.Count - 1].SubItems.Add(Networks[i, 4]);      // Authenticatiopn
-                listViewWifiStatus.Items[listViewWifiStatus.Items.Count - 1].SubItems.Add(Networks[i, 5]);      // Encryption
-                listViewWifiStatus.Items[listViewWifiStatus.Items.Count - 1].SubItems.Add(Networks[i, 6]);      // Radio Type
-                listViewWifiStatus.Items[listViewWifiStatus.Items.Count - 1].SubItems.Add(Networks[i, 7]);      // Network Type
-                listViewWifiStatus.Items[listViewWifiStatus.Items.Count - 1].SubItems.Add(Networks[i, 8]);      // Speed
-                //Trace.WriteLine("MAC : " + Networks[i, 0] + " SSID : " + Networks[i, 1] + " Channel : " + Networks[i, 2] + " SNR : " + Networks[i, 3] + "(" + Convert.ToString(Signaldbm) + ") dbm");
-
-                if (Networks[i, 1].Equals(WiFiSSIDList[WiFiTestCount]))
-                {
-                    IsWiFiScanned = true; //判斷是否有在範圍內找到欲連線的SSID
-                    WiFiSignal = Signaldbm;
-                    if (WiFiScanCount.Equals(1)) WiFiSignalAvg = Signaldbm; // 對WiFiSignalAvg進行初始化
-                    WiFiSignalAvg = (WiFiSignalAvg + WiFiSignal) / 2; // 用來計算WiFi訊號平均強度
-                    UpdateUI("No." + WiFiScanCount + " , WIFI SSID: " + Networks[i, 1] + ", SNR : " + Convert.ToString(Signaldbm) + " dbm");
-                }
-
-                int SignalInt = Convert.ToInt32(Networks[i, 3].TrimEnd(' ').TrimEnd('%'));
-                if (SignalInt > 50) listViewWifiStatus.Items[listViewWifiStatus.Items.Count - 1].ImageIndex = 0;
-                else if (SignalInt > 40) listViewWifiStatus.Items[listViewWifiStatus.Items.Count - 1].ImageIndex = 1;
-                else if (SignalInt > 30) listViewWifiStatus.Items[listViewWifiStatus.Items.Count - 1].ImageIndex = 2;
-                else if (SignalInt > 20) listViewWifiStatus.Items[listViewWifiStatus.Items.Count - 1].ImageIndex = 3;
-                else if (SignalInt > 0) listViewWifiStatus.Items[listViewWifiStatus.Items.Count - 1].ImageIndex = 4;
-
-                if ((Networks[i, 4].IndexOf("Open") != -1) & (Networks[i, 5].IndexOf("None") != -1))
-                    listViewWifiStatus.Items[listViewWifiStatus.Items.Count - 1].BackColor = Color.PaleGreen;
-                listViewWifiStatus.Items[listViewWifiStatus.Items.Count - 1].EnsureVisible();
-            }
-            #endregion
-
-            if (!IsWiFiScanned) UpdateUI("Can't find " + WiFiSSIDList[WiFiTestCount] + "\t" + DateTime.Now);
         }
 
         void PingCompletedCallBack(object sender, PingCompletedEventArgs e)
@@ -653,11 +427,7 @@ namespace wifi
                     WiFiTestCount++;
                     if (WiFiTestCount < WiFiSSIDList.Count())
                     {
-                        UpdateUI("WiFiTestCount " + WiFiTestCount + "WiFiSSIDList " + WiFiSSIDList.Count());
-                        //UpdateUI("Go to test Wi-Fi 5GHz frequency bands.\t" + DateTime.Now);
                         UpdateUI("Go to test next Wi-Fi.\t" + DateTime.Now);
-                        //IsWiFi24gPassed = true;
-                        //connectWiFiSSID = connectWiFiSSID5G;
                         //SetHosts("192.168.120.120", "www.winmate");
                         RestoreToDefaultStatus();
                     }
@@ -672,9 +442,9 @@ namespace wifi
         }
 
         #region Test Result
-        private void checkTestStatus(String testResult)
+        void checkTestStatus(String testResult)
         {
-            DisconnectWiFi(); // DisconnectNetwork();
+            DisconnectNetwork();
             if (TimerWifiTest.Enabled) TimerWifiTest.Stop();
 
             if (mPingTester != null)
@@ -682,8 +452,6 @@ namespace wifi
                 mPingTester.PingCompleted -= new PingCompletedEventHandler(this.PingCompletedCallBack);
                 mPingTester = null;
             }
-
-            //connectWiFiSSID = connectWiFiSSID24G;
 
             // 測試WIFI重複連線測試穩定度用
             if (isLoopTestWiFi.Equals(1))
@@ -738,7 +506,7 @@ namespace wifi
 
         #region Update UI
         public delegate void SafeWinFormsThreadDelegate(string msg);
-        private void UpdateUI(string msg)
+        void UpdateUI(string msg)
         {
             if (txtWiFiDetails.InvokeRequired)// 如果控制項的 Handle 是在UI執行緒以外的執行緒上建立, 則為 true (表示必須透過叫用方法呼叫), 否則為 false. 
             {   // 如果您從不同的執行緒呼叫方法, 則必須使用Invoke來封送處理對適當執行緒的呼叫. 
@@ -750,7 +518,7 @@ namespace wifi
                 UpdateDetails(msg);
             }
         }
-        private void UpdateDetails(string msg)
+        void UpdateDetails(string msg)
         {
             if (IsDebugMode) Trace.WriteLine(msg);
             txtWiFiDetails.Text = txtWiFiDetails.Text + msg + Environment.NewLine;
@@ -761,17 +529,17 @@ namespace wifi
         #endregion
 
         #region Button Event
-        private void buttonDisconnect_Click(object sender, EventArgs e)
+        void buttonDisconnect_Click(object sender, EventArgs e)
         {
             DisconnectNetwork();
         }
 
-        private void buttonRetry_Click(object sender, EventArgs e)
+        void buttonRetry_Click(object sender, EventArgs e)
         {
             RestoreToDefaultStatus();
         }
 
-        private void RestoreToDefaultStatus()
+        void RestoreToDefaultStatus()
         {
             // 一旦載入測項/重測, 除非有測試結果, 不然不讓使用者點選清單
 
@@ -780,7 +548,6 @@ namespace wifi
 
             IsWiFiScanned = false;  // 判斷是否有在範圍內找到欲連線的SSID
             WiFiScanCount = 1;
-            WiFiSignal = 0;
             WiFiSignalAvg = 0;
 
             if (mPingTester != null)

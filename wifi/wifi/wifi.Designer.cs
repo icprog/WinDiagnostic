@@ -190,7 +190,9 @@
             this.DoubleBuffered = true;
             this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "wifi";
-            this.WindowState = System.Windows.Forms.FormWindowState.Minimized;
+            this.Opacity = 0;
+            this.ShowInTaskbar = false;
+            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Load += new System.EventHandler(this.wifi_Load);
             this.groupWiFiDetails.ResumeLayout(false);
             this.groupWiFiDetails.PerformLayout();

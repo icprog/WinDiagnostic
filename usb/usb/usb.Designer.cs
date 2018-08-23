@@ -220,8 +220,9 @@
             this.Controls.Add(this.labelTitle);
             this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "usb";
-            this.ShowIcon = false;
+            this.Opacity = 0;
             this.ShowInTaskbar = false;
+            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Load += new System.EventHandler(this.usb_Load);
             this.groupUSBDetails.ResumeLayout(false);
             this.groupUSBDetails.PerformLayout();

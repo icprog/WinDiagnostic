@@ -77,10 +77,13 @@ namespace comport
             SerialPortList = jobject.SerialPort.ToObject<List<string>>();
             SerialPortList = SerialPortList.Take(SerialPortCount).ToList();
             DockingSerialPortList = jobject.DockingSerialPort.ToObject<List<string>>();
-            DockingSerialPortList = DockingSerialPortList.Take(DockingSerialPortCount).ToList();       
+            DockingSerialPortList = DockingSerialPortList.Take(DockingSerialPortCount).ToList();
 
             if (ShowWindow)
-                this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+            {
+                this.Opacity = 100;
+                this.ShowInTaskbar = true;
+            }
 
             if (IsDebugMode) Trace.WriteLine("Comport_Load");
 

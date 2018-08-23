@@ -597,7 +597,9 @@
             this.Controls.Add(this.groupDeviceDetails);
             this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "bluetooth";
-            this.WindowState = System.Windows.Forms.FormWindowState.Minimized;
+            this.Opacity = 0;
+            this.ShowInTaskbar = false;
+            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Load += new System.EventHandler(this.bluetooth_Load);
             this.groupDeviceDetails.ResumeLayout(false);
             this.groupDeviceDetails.PerformLayout();

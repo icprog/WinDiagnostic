@@ -72,7 +72,10 @@ namespace usb
             ShowWindow = (bool)jobject.ShowWindow;
 
             if (ShowWindow)
-                this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+            {
+                this.Opacity = 100;
+                this.ShowInTaskbar = true;
+            }
 
             if (IsDebugMode) Trace.WriteLine("USB_Load");
 

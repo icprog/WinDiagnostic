@@ -1,0 +1,11 @@
+{
+  "name": "lightsensor_m101b",
+  "LIGHT_SENSOR_COEFFICIENT": 0.05,
+  "TimerIntervalLightSensor": 250,
+  "LightSensorMaxThreshold": 1000,
+  "LightSensorMinThreshold": 5,
+  "PortAddressRTS": "COM11",
+  "IsSensorHubBuildInCPU": false,
+  "IsTablet": false,
+  "ShowWindow": false
+}

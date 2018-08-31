@@ -53,6 +53,18 @@ namespace usb
             InitializeComponent();
         }
 
+        void Exit()
+        {
+            if (Application.MessageLoop)
+            {
+                Application.Exit();
+            }
+            else
+            {
+                Environment.Exit(1);
+            }
+        }
+
         private void usb_Load(object sender, EventArgs e)
         {
             //AllocConsole();
@@ -61,7 +73,7 @@ namespace usb
             if (!File.Exists(jsonconfig))
             {
                 MessageBox.Show("config.json not founded");
-                Environment.Exit(0);
+                Exit();
             }
 
             dynamic jobject = JObject.Parse(File.ReadAllText(jsonconfig));
@@ -85,7 +97,7 @@ namespace usb
             Thread.Sleep(200);
             File.Create(GetFullPath("completed"));
             if (!ShowWindow)
-                Environment.Exit(0);
+                Exit();
         }
         private bool HasMemoryCardSlot()
         {

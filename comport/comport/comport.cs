@@ -30,12 +30,6 @@ namespace comport
         string SerialPortTestFailName = ""; // 目前測試失敗的Comport名稱
         int SerialPortCount = 1;
         int DockingSerialPortCount = 1;
-        string SerialPort1 = "COM1";
-        string SerialPort2 = "COM2";
-        string SerialPort3 = "COM3";
-        string SerialPort4 = "COM4";
-        string DockingSerialPort1 = "COM11";
-        string DockingSerialPort2 = "COM12";
         Label[] label;
 
 
@@ -54,6 +48,18 @@ namespace comport
             return Path.Combine(exepath, path);
         }
 
+        void Exit()
+        {
+            if (Application.MessageLoop)
+            {
+                Application.Exit();
+            }
+            else
+            {
+                Environment.Exit(1);
+            }
+        }
+
         private void comport_Load(object sender, EventArgs e)
         {
             result["result"] = false;
@@ -61,23 +67,17 @@ namespace comport
             if (!File.Exists(jsonconfig))
             {
                 MessageBox.Show("config.json not founded");
-                Environment.Exit(0);
+                Exit();
             }
 
             dynamic jobject = JObject.Parse(File.ReadAllText(jsonconfig));
             SerialPortCount = (int)jobject.SerialPortCount;
             DockingSerialPortCount = (int)jobject.DockingSerialPortCount;
-            SerialPort1 = (string)jobject.SerialPort1;
-            SerialPort2 = (string)jobject.SerialPort2;
-            SerialPort3 = (string)jobject.SerialPort3;
-            SerialPort4 = (string)jobject.SerialPort4;
-            DockingSerialPort1 = (string)jobject.DockingSerialPort1;
-            DockingSerialPort2 = (string)jobject.DockingSerialPort2;
             ShowWindow = (bool)jobject.ShowWindow;
             SerialPortList = jobject.SerialPort.ToObject<List<string>>();
             SerialPortList = SerialPortList.Take(SerialPortCount).ToList();
             DockingSerialPortList = jobject.DockingSerialPort.ToObject<List<string>>();
-            DockingSerialPortList = DockingSerialPortList.Take(DockingSerialPortCount).ToList();
+            DockingSerialPortList = DockingSerialPortList.Take(DockingSerialPortCount).ToList();            
 
             if (ShowWindow)
             {
@@ -97,7 +97,7 @@ namespace comport
             Thread.Sleep(200);
             File.Create(GetFullPath("completed"));
             if (!ShowWindow)
-                Environment.Exit(0);
+                Exit();
         }
 
         private void buttonSerialPort_Click(object sender, EventArgs e)
@@ -118,64 +118,85 @@ namespace comport
             SerialPortTestPassName = "";
             SerialPortTestFailName = "";
 
-            Label[] portlabel = new Label[SerialPortCount];
-            for (int i = 0; i < SerialPortCount; i++)
-            {
-                portlabel[i] = new Label();
-                portlabel[i].Text = string.Format("Port{0} : {1}                 ", i + 1, SerialPortList[i]);
-                portlabel[i].Left = this.buttonSerialPort.Left;
-                portlabel[i].Font = new System.Drawing.Font("Arial", 15F);
-                portlabel[i].AutoSize = true;
-                if (i > 0)
-                {
-                    portlabel[i].Top = portlabel[i - 1].Bottom;
-                }
-                else
-                {
-                    portlabel[i].Top = this.buttonSerialPort.Bottom;
-                }
+            Label[] portlabel = null;
+            Label[] dockinglabel = null;
 
-                this.groupSerialPort.Controls.Add(portlabel[i]);
+
+            if (SerialPortCount != 0)
+            {
+                portlabel = new Label[SerialPortCount];
+                for (int i = 0; i < SerialPortCount; i++)
+                {
+                    portlabel[i] = new Label();
+                    portlabel[i].Text = string.Format("Port{0} : {1}                 ", i + 1, SerialPortList[i]);
+                    portlabel[i].Left = this.buttonSerialPort.Left;
+                    portlabel[i].Font = new System.Drawing.Font("Arial", 15F);
+                    portlabel[i].AutoSize = true;
+                    if (i > 0)
+                    {
+                        portlabel[i].Top = portlabel[i - 1].Bottom;
+                    }
+                    else
+                    {
+                        portlabel[i].Top = this.buttonSerialPort.Bottom;
+                    }
+
+                    this.groupSerialPort.Controls.Add(portlabel[i]);
+                }
             }
 
-            Label[] dockinglabel = new Label[DockingSerialPortCount];
-            for (int i = 0; i < DockingSerialPortCount; i++)
+            if (DockingSerialPortCount != 0)
             {
-                dockinglabel[i] = new Label();
-                dockinglabel[i].Text = string.Format("DockingPort{0} : {1}", i + 1, DockingSerialPortList[i]);
-                dockinglabel[i].Left = this.buttonSerialPort.Left;
-                dockinglabel[i].Font = new System.Drawing.Font("Arial", 15F);
-                dockinglabel[i].AutoSize = true;
-                if (i > 0)
+                dockinglabel = new Label[DockingSerialPortCount];
+                for (int i = 0; i < DockingSerialPortCount; i++)
                 {
-                    dockinglabel[i].Top = dockinglabel[i - 1].Bottom;
-                }
-                else
-                {
-                    dockinglabel[i].Top = portlabel[SerialPortCount - 1].Bottom;
-                }
+                    dockinglabel[i] = new Label();
+                    dockinglabel[i].Text = string.Format("DockingPort{0} : {1}", i + 1, DockingSerialPortList[i]);
+                    dockinglabel[i].Left = this.buttonSerialPort.Left;
+                    dockinglabel[i].Font = new System.Drawing.Font("Arial", 15F);
+                    dockinglabel[i].AutoSize = true;
+                    if (i > 0)
+                    {
+                        dockinglabel[i].Top = dockinglabel[i - 1].Bottom;
+                    }
+                    else if (SerialPortCount == 0)
+                    {
+                        dockinglabel[i].Top = this.buttonSerialPort.Bottom;
+                    }
+                    else
+                    {
+                        dockinglabel[i].Top = portlabel[SerialPortCount - 1].Bottom;
+                    }
 
-                this.groupSerialPort.Controls.Add(dockinglabel[i]);
+                    this.groupSerialPort.Controls.Add(dockinglabel[i]);
+                }
             }
 
-            label = new Label[SerialPortCount + DockingSerialPortCount];
-            for (int i = 0; i < SerialPortCount + DockingSerialPortCount; i++)
+            if (SerialPortCount != 0 || DockingSerialPortCount != 0)
             {
-                label[i] = new Label();
-                label[i].Text = "Unknown";
-                label[i].ForeColor = Color.Blue;
-                label[i].Left = portlabel[0].Right;
-                label[i].Font = new System.Drawing.Font("Arial", 15F);
-                if (i > 0)
+                label = new Label[SerialPortCount + DockingSerialPortCount];
+                for (int i = 0; i < SerialPortCount + DockingSerialPortCount; i++)
                 {
-                    label[i].Top = label[i - 1].Bottom;
-                }
-                else
-                {
-                    label[i].Top = this.buttonSerialPort.Bottom;
-                }
+                    label[i] = new Label();
+                    label[i].Text = "Unknown";
+                    label[i].ForeColor = Color.Blue;
+                    if (SerialPortCount != 0)
+                        label[i].Left = portlabel[0].Right;
+                    else
+                        label[i].Left = dockinglabel[0].Right;
 
-                this.groupSerialPort.Controls.Add(label[i]);
+                    label[i].Font = new System.Drawing.Font("Arial", 15F);
+                    if (i > 0)
+                    {
+                        label[i].Top = label[i - 1].Bottom;
+                    }
+                    else
+                    {
+                        label[i].Top = this.buttonSerialPort.Bottom;
+                    }
+
+                    this.groupSerialPort.Controls.Add(label[i]);
+                }
             }
         }
 
@@ -256,15 +277,21 @@ namespace comport
                 ++SerialPortTestPassCount;
                 SerialPortTestPassName += testSerialPort + " ";
                 UpdateComportDetails(testSerialPort + " is PASS.\r\n");
-                label[SerialPortList.IndexOf(testSerialPort)].Text = "PASS";
-                label[SerialPortList.IndexOf(testSerialPort)].ForeColor = Color.Green;
+                if (SerialPortCount != 0 || DockingSerialPortCount != 0)
+                {
+                    label[SerialPortList.IndexOf(testSerialPort)].Text = "PASS";
+                    label[SerialPortList.IndexOf(testSerialPort)].ForeColor = Color.Green;
+                }
             }
             else
             {
                 SerialPortTestFailName += testSerialPort + " ";
                 UpdateComportDetails(testSerialPort + " is FAIL!\r\n");
-                label[SerialPortList.IndexOf(testSerialPort)].Text = "FAIL";
-                label[SerialPortList.IndexOf(testSerialPort)].ForeColor = Color.Red;
+                if (SerialPortCount != 0 || DockingSerialPortCount != 0)
+                {
+                    label[SerialPortList.IndexOf(testSerialPort)].Text = "FAIL";
+                    label[SerialPortList.IndexOf(testSerialPort)].ForeColor = Color.Red;
+                }
             }
             #endregion
 

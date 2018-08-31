@@ -72,6 +72,18 @@ namespace bluetooth
             return Path.Combine(exepath, path);
         }
 
+        void Exit()
+        {
+            if (Application.MessageLoop)
+            {
+                Application.Exit();
+            }
+            else
+            {
+                Environment.Exit(1);
+            }
+        }
+
         private void bluetooth_Closing(object sender, CancelEventArgs e)
         {
             if (mObexListener != null) mObexListener.Stop();
@@ -84,7 +96,7 @@ namespace bluetooth
             if (!File.Exists(jsonconfig))
             {
                 MessageBox.Show("config.json not founded");
-                Environment.Exit(0);
+                Exit();
             }
 
             dynamic jobject = JObject.Parse(File.ReadAllText(jsonconfig));
@@ -141,7 +153,7 @@ namespace bluetooth
             Thread.Sleep(200);
             File.Create(GetFullPath("completed"));
             if (!ShowWindow)
-                Environment.Exit(0);
+                Exit();
         }
 
         private void buttonFindBluetoothDevice_Click(object sender, EventArgs e)

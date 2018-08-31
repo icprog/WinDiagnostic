@@ -128,6 +128,18 @@ namespace camera
             return Path.Combine(exepath, path);
         }
 
+        void Exit()
+        {
+            if (Application.MessageLoop)
+            {
+                Application.Exit();
+            }
+            else
+            {
+                Environment.Exit(1);
+            }
+        }
+
         void camera_Load(object sender, EventArgs e)
         {
             result["result"] = false;
@@ -135,7 +147,7 @@ namespace camera
             if (!File.Exists(jsonconfig))
             {
                 MessageBox.Show("config.json not founded");
-                Environment.Exit(0);
+                Exit();
             }
 
             dynamic jobject = JObject.Parse(File.ReadAllText(jsonconfig));
@@ -589,7 +601,7 @@ namespace camera
             Thread.Sleep(200);
             File.Create(GetFullPath("completed"));
             if (!ShowWindow)
-                Environment.Exit(0);
+                Exit();
         }
 
         void FreeResources()

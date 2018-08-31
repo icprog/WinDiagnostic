@@ -77,7 +77,7 @@ namespace lightsensor
                 {
                     if (serialPortRTS == null)
                     {
-                        // if (IsDebugMode) Trace.WriteLine("serialPortRTS == null");
+                        //if (IsDebugMode) Trace.WriteLine("serialPortRTS == null");
                         serialPortRTS = new SerialPort();
                     }
 
@@ -103,6 +103,7 @@ namespace lightsensor
                         Trace.WriteLine("Open RTS SerialPort : " + serialPortRTS.PortName);
                         serialPortRTS.Open();
                     }
+
                     return serialPortRTS;
                 }
                 catch (Exception ex)
@@ -161,6 +162,18 @@ namespace lightsensor
             return Path.Combine(exepath, path);
         }
 
+        void Exit()
+        {
+            if (Application.MessageLoop)
+            {
+                Application.Exit();
+            }
+            else
+            {
+                Environment.Exit(1);
+            }
+        }
+
         void lightsensor_Load(object sender, EventArgs e)
         {
             result["result"] = false;
@@ -168,7 +181,7 @@ namespace lightsensor
             if (!File.Exists(jsonconfig))
             {
                 MessageBox.Show("config.json not founded");
-                Environment.Exit(0);
+                Exit();
             }
 
             dynamic jobject = JObject.Parse(File.ReadAllText(jsonconfig));
@@ -207,7 +220,6 @@ namespace lightsensor
             }
             else
             {
-                Trace.WriteLine("4");
                 checkTestStatus("LightSensor is not support this product.");
             }
         }
@@ -222,7 +234,6 @@ namespace lightsensor
             // 只有由SensorHub去控制LightSensor才需要額外用STMicroSensorHub工具去抓SensorHub的值
             try
             {
-                Trace.WriteLine("3");
                 buttonSensorHub.Enabled = false;
                 if (CultureInfo.CurrentCulture.Name.Equals("en-US") || CultureInfo.CurrentCulture.Name.Equals("zh-TW"))
                 {
@@ -449,6 +460,9 @@ namespace lightsensor
                 if (isSensorHubExist) bRet = GetLightVariable(out lightSensorTemp);
                 else bRet = GetLightSensorChannel0(out lightSensorTemp);
 
+                SetAutoBrightnessStatus(true, 1);
+                SetAutoBrightnessStatus(true, 0);
+
                 if (bRet)
                 {
                     labelLightSensor.Text = lightSensorTemp.ToString();
@@ -501,8 +515,6 @@ namespace lightsensor
                 Trace.WriteLine("MinValue : " + lightSensorMinValue.ToString().PadRight(4, ' ') + "\tMinThreshold : " + LightSensorMinThreshold);
             }
 
-            DisableLightSensorDetect();
-
             labelTitle.Text = "LightSensor";
             labelTitle.ForeColor = Color.Black;
             labelTitle.Update();
@@ -529,7 +541,7 @@ namespace lightsensor
             Thread.Sleep(200);
             File.Create(GetFullPath("completed"));
             if (!ShowWindow)
-                Environment.Exit(0);
+                Exit();
         }
     }
 }

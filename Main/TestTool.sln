@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "camera", "..\camera\camera\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "lightsensor", "..\lightsensor\lightsensor\lightsensor.csproj", "{991F9013-1279-4CBD-B404-50FFDD1C3F33}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "rotation", "..\rotation\rotation\rotation.csproj", "{39E93F6B-18E9-4914-B0A3-EA309F89E138}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -75,6 +77,10 @@ Global
 		{991F9013-1279-4CBD-B404-50FFDD1C3F33}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{991F9013-1279-4CBD-B404-50FFDD1C3F33}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{991F9013-1279-4CBD-B404-50FFDD1C3F33}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39E93F6B-18E9-4914-B0A3-EA309F89E138}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39E93F6B-18E9-4914-B0A3-EA309F89E138}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39E93F6B-18E9-4914-B0A3-EA309F89E138}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39E93F6B-18E9-4914-B0A3-EA309F89E138}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

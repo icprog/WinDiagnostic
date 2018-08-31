@@ -1,0 +1,12 @@
+{
+  "name": "rotation_m101b",
+  "RotationSupport": true,
+  "IsAutoModeRotation": true,
+  "MinAxisX": -1,
+  "MinAxisY": -1.05,
+  "MinAxisZ": -0.45,
+  "MaxAxisX": 0.05,
+  "MaxAxisY": 0.05,
+  "MaxAxisZ": 0.01,
+  "ShowWindow": false
+}

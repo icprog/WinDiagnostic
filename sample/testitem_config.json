@@ -4,7 +4,7 @@
   "items": [ "automatic" ],
   "automatic": {
     "name": "Automatic",
-    "items": [ "AUDIO","USB","COMPORT","BLUETOOTH","CAMERA","LIGHTSENSOR","NETWORK"],
+    "items": [ "AUDIO","USB","COMPORT","BLUETOOTH","CAMERA","LIGHTSENSOR","ROTATION","NETWORK"],
     "AUDIO": {
       "name": "Audio",
       "path": "audio",
@@ -33,6 +33,11 @@
 	  "LIGHTSENSOR": {
       "name": "LIGHTSENSOR",
       "path": "lightersensor",
+      "timeout": 120
+    },
+	  "ROTATION": {
+      "name": "ROTATION",
+      "path": "rotation",
       "timeout": 120
     },
 	  "NETWORK": {

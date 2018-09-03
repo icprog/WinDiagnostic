@@ -71,6 +71,7 @@ namespace wifi
         int WiFiTestCount = 0;
         Wifi Wifi = null;
         AccessPoint ConnectAccessPoint = null;
+        string ip = string.Empty;
         #endregion
 
         public wifi()
@@ -84,6 +85,18 @@ namespace wifi
             return Path.Combine(exepath, path);
         }
 
+        void Exit()
+        {
+            if (Application.MessageLoop)
+            {
+                Application.Exit();
+            }
+            else
+            {
+                Environment.Exit(1);
+            }
+        }
+
         void wifi_Load(object sender, EventArgs e)
         {
             result["result"] = false;
@@ -91,7 +104,7 @@ namespace wifi
             if (!File.Exists(jsonconfig))
             {
                 MessageBox.Show("config.json not founded");
-                Environment.Exit(0);
+                Exit();
             }
 
             dynamic jobject = JObject.Parse(File.ReadAllText(jsonconfig));
@@ -292,6 +305,62 @@ namespace wifi
             return true;
         }
 
+        public string GetIpByHostName(string hostName)
+        {
+            hostName = hostName.Trim();
+            if (hostName == string.Empty)
+                return string.Empty;
+
+            try
+            {
+                System.Net.IPHostEntry host = System.Net.Dns.GetHostEntry(hostName);
+                return host.AddressList.GetValue(0).ToString();
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine(string.Format("hostname exception {0}",ex));
+                return string.Empty;
+            }
+        }
+
+        public string DoGetHostAddresses(string hostname)
+        {
+            try
+            {
+                IPAddress[] addresses = Dns.GetHostAddresses(hostname);
+                return addresses.FirstOrDefault().ToString();
+            }
+            catch(Exception ex)
+            {
+                Trace.WriteLine(Wifi.ConnectionStatus);
+                Trace.WriteLine(string.Format("DoGetHostAddresses exception {0}", ex));
+                return string.Empty;
+            }
+        }
+
+        public void GetIpFromHost(int TimeOut)
+        {
+            var tokenSource = new CancellationTokenSource();
+            var token = tokenSource.Token;
+
+            var GetIpTask = Task.Factory.StartNew(() =>
+            {
+                while (!token.IsCancellationRequested)
+                {
+                    ip = GetIpByHostName(PingAddressList[WiFiTestCount]);
+                    if (!string.IsNullOrEmpty(ip))
+                    {
+                        tokenSource.Cancel();
+                    }
+
+                    Thread.Sleep(1000);
+                }
+            }, token);
+
+            GetIpTask.Wait(TimeOut);
+            tokenSource.Cancel();
+        }
+
         public void TestNetworkStability()
         {
             if (IsWiFiScanned)
@@ -318,6 +387,8 @@ namespace wifi
                     tryConnectNetCount = 0;
                     PingStatusSuccess = 0;
 
+                    GetIpFromHost(6000);
+
                     if (mPingTester == null)
                     {
                         UpdateUI("Initial Ping Tester");
@@ -331,7 +402,9 @@ namespace wifi
                             SetRouteTable(EthernetGateway[i], EthernetInterface[i], 1, Operation.Delete);
 
                         Thread.Sleep(50);
-                        mPingTester.SendAsync(PingAddressList[WiFiTestCount], PingIntervalWiFi, pingBuffer, null); // 開啟一個Thread來Ping遠程主機
+                        
+                        mPingTester.SendAsync(ip, PingIntervalWiFi, pingBuffer, null);
+                        //mPingTester.SendAsync(ip, PingIntervalWiFi, pingBuffer, null); // 開啟一個Thread來Ping遠程主機
                     }
                 }
                 #endregion
@@ -415,7 +488,7 @@ namespace wifi
 
             if (tryConnectNetCount < TotalPingCountWiFi)
             {
-                mPingTester.SendAsync(PingAddressList[WiFiTestCount], PingIntervalWiFi, pingBuffer, null);
+                mPingTester.SendAsync(ip, PingIntervalWiFi, pingBuffer, null);
             }
             else
             {
@@ -499,7 +572,7 @@ namespace wifi
             Thread.Sleep(200);
             File.Create(GetFullPath("completed"));
             if (!ShowWindow)
-                Environment.Exit(0);
+                Exit();
         }
 
         #endregion

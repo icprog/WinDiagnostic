@@ -1,7 +1,7 @@
 {
   "name": "lightsensor_m101b",
   "LIGHT_SENSOR_COEFFICIENT": 0.05,
-  "TimerIntervalLightSensor": 250,
+  "TimerIntervalLightSensor": 1000,
   "LightSensorMaxThreshold": 1000,
   "LightSensorMinThreshold": 5,
   "PortAddressRTS": "COM11",

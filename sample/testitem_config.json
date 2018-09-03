@@ -32,7 +32,7 @@
     },
 	  "LIGHTSENSOR": {
       "name": "LIGHTSENSOR",
-      "path": "lightersensor",
+      "path": "lightsensor",
       "timeout": 120
     },
 	  "ROTATION": {

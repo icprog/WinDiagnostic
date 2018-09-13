@@ -1,12 +1,14 @@
 @echo off
 
-ping -n 1 192.168.100.94 | find "ms" > nul	rem check server is running
+rem check server is running
+ping -n 1 192.168.100.94 | find "ms" > nul
 
 if %errorlevel% == 0 (goto pingok) else (goto pingfail)
 
+rem map network drive x:
 :pingok
 if not exist x:\ (
-net use x: \\192.168.100.94\testdb /user:ubuntu password	rem map network drive x:
+net use x: \\192.168.100.94\testdb /user:ubuntu password
 )
 
 if %errorlevel% == 0 (goto success) else (goto fail)
@@ -28,7 +30,7 @@ mkdir testdb\Lib\%%i
 copy %%i\%%i\bin\Release\*.exe  testdb\Lib\%%i
 copy %%i\%%i\bin\Release\*.dll  testdb\Lib\%%i
 copy %%i\%%i\bin\Release\*.wav  testdb\Lib\%%i
-echo.start %%i.exe>testdb\Lib\%%i\run.bat	rem create run.bat
+echo.start %%i.exe>testdb\Lib\%%i\run.bat
 )
 
 rmdir /s /q testdb\Lib\.git

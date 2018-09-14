@@ -1,0 +1,1 @@
+STMicroSensorHubTool.exe /update STM32F103_HIDoverUSB_ST_Reference_V0034.hex

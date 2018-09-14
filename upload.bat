@@ -30,6 +30,7 @@ mkdir testdb\Lib\%%i
 copy %%i\%%i\bin\Release\*.exe  testdb\Lib\%%i
 copy %%i\%%i\bin\Release\*.dll  testdb\Lib\%%i
 copy %%i\%%i\bin\Release\*.wav  testdb\Lib\%%i
+xcopy %%i\%%i\bin\Release\sensor  testdb\Lib\%%i\sensor /Y /I /E
 echo.start %%i.exe>testdb\Lib\%%i\run.bat
 )
 
@@ -50,6 +51,8 @@ rem delete not necessary files
 for /r %cd%\testdb\Lib %%i in (*) do (
 	if not "%%~xi" == ".zip" (DEL /F /A /Q %%i)
 )
+
+rmdir /s /q %cd%\testdb\Lib\lightsensor\sensor
 
 rem copy .json files
 for /f "delims=" %%i in ('"dir/a:d/b sample"') do (

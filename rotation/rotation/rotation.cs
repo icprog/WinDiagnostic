@@ -80,7 +80,7 @@ namespace rotation
 
         void rotation_Load(object sender, EventArgs e)
         {
-            result["result"] = false;
+            result["result"] = "FAIL";
             var jsonconfig = GetFullPath("config.json");
             if (!File.Exists(jsonconfig))
             {
@@ -242,13 +242,13 @@ namespace rotation
             {
                 labelResult.Text = "PASS";
                 labelResult.ForeColor = Color.Green;
-                result["result"] = true;
+                result["result"] = "PASS";
             }
             else
             {
                 labelResult.Text = "FAIL";
                 labelResult.ForeColor = Color.Red;
-                result["result"] = false;
+                result["result"] = "FAIL";
             }
 
             File.WriteAllText(GetFullPath("result.json"), result.ToString());

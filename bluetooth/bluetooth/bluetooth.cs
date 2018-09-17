@@ -91,7 +91,7 @@ namespace bluetooth
 
         private void bluetooth_Load(object sender, EventArgs e)
         {
-            result["result"] = false;
+            result["result"] = "FAIL";
             var jsonconfig = GetFullPath("config.json");
             if (!File.Exists(jsonconfig))
             {
@@ -900,11 +900,11 @@ namespace bluetooth
 
             if (testResult.Equals("PASS"))
             {
-                result["result"] = true;
+                result["result"] = "PASS";
             }
             else
             {
-                result["result"] = false;
+                result["result"] = "FAIL";
             }
 
         }

@@ -142,7 +142,7 @@ namespace camera
 
         void camera_Load(object sender, EventArgs e)
         {
-            result["result"] = false;
+            result["result"] = "FAIL";
             var jsonconfig = GetFullPath("config.json");
             if (!File.Exists(jsonconfig))
             {
@@ -588,13 +588,13 @@ namespace camera
             {
                 labelResult.ForeColor = Color.Green;
                 labelResult.Text = "PASS";
-                result["result"] = true;
+                result["result"] = "PASS";
             }
             else
             {
                 labelResult.ForeColor = Color.Red;
                 labelResult.Text = "FAIL";
-                result["result"] = false;
+                result["result"] = "FAIL";
             }
 
             File.WriteAllText(GetFullPath("result.json"), result.ToString());

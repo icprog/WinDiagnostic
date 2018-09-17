@@ -40,7 +40,7 @@ namespace audio
                     return;
                 }
                     
-                result["result"] = false;
+                result["result"] = "FAIL";
                 dynamic jobject = JObject.Parse(File.ReadAllText(jsonconfig));
 
                 if ((bool)jobject.ShowWindow)
@@ -89,7 +89,7 @@ namespace audio
                         break;
                     case Result.Pass:
                         Console.WriteLine("Pass");
-                        result["result"] = true;
+                        result["result"] = "PASS";
                         break;
                     case Result.ExceptionFail:
                         Console.WriteLine("ExceptionFail");

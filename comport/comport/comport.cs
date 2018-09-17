@@ -62,7 +62,7 @@ namespace comport
 
         private void comport_Load(object sender, EventArgs e)
         {
-            result["result"] = false;
+            result["result"] = "FAIL";
             var jsonconfig = GetFullPath("config.json");
             if (!File.Exists(jsonconfig))
             {
@@ -319,7 +319,7 @@ namespace comport
             {
                 labelResult.Text = "PASS";
                 labelResult.ForeColor = Color.Green;
-                result["result"] = true;
+                result["result"] = "PASS";
             }
             else
             {

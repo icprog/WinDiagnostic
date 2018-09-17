@@ -110,7 +110,7 @@ namespace lan
             GetNetworkInformation(NetworkInterfaceType.Wireless80211);
             GetNetworkInformation(NetworkInterfaceType.Ethernet);
 
-            result["result"] = false;
+            result["result"] = "FAIL";
             var jsonconfig = GetFullPath("config.json");
             if (!File.Exists(jsonconfig))
             {
@@ -605,7 +605,7 @@ namespace lan
                 //TestReport.setEIPResult("LAN", "@PASS");
                 //PublicFunction.AddTestNameToCurrentAlarmReport(true, "LAN");// 儲存自動測項中PASS的測項名稱
                 GotoNextTestItem("PASS");
-                result["result"] = true;
+                result["result"] = "PASS";
             }
             else
             {
@@ -621,7 +621,7 @@ namespace lan
                 //// 自動測項此時測試失敗, 讓SerialNumber頁面背景閃紅色
                 //PublicFunction.AddTestNameToCurrentAlarmReport(false, "LAN");// 儲存自動測項中FAIL的測項名稱
                 GotoNextTestItem("FAIL");
-                result["result"] = false;                
+                result["result"] = "FAIL";                
             }
             lock (objlock)
             {

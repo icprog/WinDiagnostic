@@ -99,7 +99,7 @@ namespace wifi
 
         void wifi_Load(object sender, EventArgs e)
         {
-            result["result"] = false;
+            result["result"] = "FAIL";
             var jsonconfig = GetFullPath("config.json");
             if (!File.Exists(jsonconfig))
             {
@@ -549,14 +549,14 @@ namespace wifi
             {
                 labelResult.Text = "PASS";
                 labelResult.ForeColor = Color.Green;
-                result["result"] = true;
+                result["result"] = "PASS";
             }
             else
             {
                 if (!testResult.Equals("FAIL")) labelResult.Text = "FAIL. " + testResult;
                 else labelResult.Text = "FAIL";
                 labelResult.ForeColor = Color.Red;
-                result["result"] = false;
+                result["result"] = "FAIL";
                 //if (PingStatusSuccess <= 0)
             }
 

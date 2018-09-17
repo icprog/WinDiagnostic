@@ -68,7 +68,7 @@ namespace usb
         private void usb_Load(object sender, EventArgs e)
         {
             //AllocConsole();
-            result["result"] = false;
+            result["result"] = "FAIL";
             var jsonconfig = GetFullPath("config.json");
             if (!File.Exists(jsonconfig))
             {
@@ -387,7 +387,7 @@ namespace usb
                 }
                 labelResult.Text = "PASS";
                 labelResult.ForeColor = Color.Green;
-                result["result"] = true;
+                result["result"] = "PASS";
                 Trace.WriteLine(testResult);
             }
             else
@@ -401,7 +401,7 @@ namespace usb
                 }
                 labelResult.Text = "FAIL";
                 labelResult.ForeColor = Color.Red;
-                result["result"] = false;
+                result["result"] = "FAIL";
                 Trace.WriteLine(testResult);
             }
         }

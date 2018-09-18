@@ -126,7 +126,10 @@ namespace lan
             LanNum = (int)jobject.LanNum;
 
             if (ShowWindow)
-                this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+            {
+                this.Opacity = 100;
+                this.ShowInTaskbar = true;
+            }
 
             if (IsDebugMode) Trace.WriteLine("LAN_Load");
 
@@ -206,20 +209,27 @@ namespace lan
 
         void Trigger()
         {
-            Task t = Task.Run(() =>
+            var tokenSource = new CancellationTokenSource();
+            var token = tokenSource.Token;
+
+            Task t = Task.Factory.StartNew(() =>
             {
                 if (CheckLanSettingReady())
                 {
-                    if (IsEthernet1Available()) buttonConnectEthernet1_Click(null, new EventArgs());
+                    if (IsEthernet1Available())
+                    {
+                        tokenSource.Cancel();
+                        buttonConnectEthernet1_Click(null, new EventArgs());
+                    }
                     else
                         bDoNext = true;
 
-                    while (true)
+                    while (!token.IsCancellationRequested)
                     {
-                        if (bDoNext)
-                            break;
+                        //if (bDoNext)
+                        //    break;
                         Console.WriteLine("Wait...");
-                        Thread.Sleep(3000);
+                        Thread.Sleep(100);
                     }
 
                     if (NumberOfEthernets >= 2)
@@ -229,7 +239,14 @@ namespace lan
                             checkTestStatus("FAIL");
                     }
                 }
-            });
+            }, token);
+
+            t.Wait(6000);
+
+            if(!t.IsCompleted)
+                checkTestStatus("FAIL");
+
+            tokenSource.Cancel();
         }
 
         private bool CheckLanSettingReady()

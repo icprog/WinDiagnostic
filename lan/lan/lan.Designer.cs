@@ -241,6 +241,9 @@
             this.Controls.Add(this.groupLANDetails);
             this.DoubleBuffered = true;
             this.Name = "lan";
+            this.Opacity = 0;
+            this.ShowInTaskbar = false;
+            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Load += new System.EventHandler(this.LAN_Load);
             this.groupLANDetails.ResumeLayout(false);
             this.groupLANDetails.PerformLayout();

@@ -6,7 +6,7 @@
   "PingSuccessRate" : 0.9,
   "TotalPingCount" : 50,
   "PingAddressWiFi": ["www.winmate","www.winmate"],
-  "SSID": ["WinmateTest","WinmateTest-5GHz"],
-  "Password": ["",""],
+  "SSID": ["testwifi","testwifi_5G"],
+  "Password": ["96930209","96930209"],
   "ShowWindow": false
 }

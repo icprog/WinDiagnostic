@@ -69,8 +69,10 @@ rmdir /s /q testdb\Lib\lan
 
 rem copy all files to server
 for /f "delims=" %%i in ('"dir/a:d/b testdb\Lib"') do (
-	xcopy testdb\Lib\%%i x:\Lib\%%i /Y /I /E
+	echo xcopy testdb\Lib\%%i x:\Lib\%%i /Y /I /E /R
+	xcopy testdb\Lib\%%i x:\Lib\%%i /Y /I /E /R
 )
 goto done
 
 :done
+pause

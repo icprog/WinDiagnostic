@@ -46,8 +46,9 @@ namespace audio
                 if ((bool)jobject.ShowWindow)
                     AllocConsole();
 
-                var name = jobject.name.ToString();
-                var Model = name.Substring(name.IndexOf("_") + 1);
+                //var name = jobject.name.ToString();
+                //var Model = name.Substring(name.IndexOf("_") + 1);
+                var Model = jobject.TestProduct.ToString();
                 AudioTest api = new AudioTest(Model, true);
                 api.WavFileName = wavpath;
                 api.ExternalRecordThreshold = (double)jobject.ExternalRecordThreshold;

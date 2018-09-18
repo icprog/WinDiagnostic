@@ -4,5 +4,5 @@
   "DockingSerialPortCount": 1,
   "SerialPort":["COM1"],
   "DockingSerialPort":["COM11"],
-  "ShowWindow": false,
+  "ShowWindow": false
 }

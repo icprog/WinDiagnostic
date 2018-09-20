@@ -806,13 +806,25 @@ namespace lan
             checkTestStatus("Force stop LAN test");
         }
 
+        void Exit()
+        {
+            if (Application.MessageLoop)
+            {
+                Application.Exit();
+            }
+            else
+            {
+                Environment.Exit(1);
+            }
+        }
+
         void ResultToJsonFile()
         {
             File.WriteAllText(GetFullPath("result.json"), result.ToString());
             Thread.Sleep(200);
             File.Create(GetFullPath("completed"));
-            //if (!ShowWindow)
-            //    Environment.Exit(0);
+            if (!ShowWindow)
+                Exit();
         }
 
         bool GetNetworkInformation(NetworkInterfaceType NetworkInterfaceType)

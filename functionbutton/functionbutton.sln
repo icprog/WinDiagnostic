@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27703.2026
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "functionbutton", "functionbutton\functionbutton.csproj", "{09156B78-CE50-4E34-AACF-3D6F610056E5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{09156B78-CE50-4E34-AACF-3D6F610056E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09156B78-CE50-4E34-AACF-3D6F610056E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09156B78-CE50-4E34-AACF-3D6F610056E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09156B78-CE50-4E34-AACF-3D6F610056E5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5F7B616A-9B0C-46CF-9D0A-9BACE0BD693C}
+	EndGlobalSection
+EndGlobal

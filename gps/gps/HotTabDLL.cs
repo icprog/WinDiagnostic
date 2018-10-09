@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 
-namespace camera
+namespace gps
 {
     enum GSensor_Orientation : int
     {
@@ -494,6 +494,43 @@ namespace camera
                     Sleep(100);
             } while (bResult == false);
 
+            return bResult;
+        }
+
+        public static bool WinIO_FunctionButtonLock()
+        {
+            bool bResult = false;
+
+#if Debug
+            // Winmate Kenkun remove on 2015/09/09
+            // if (IsOldHottabVersion) 
+            // {
+            //    if (IsDebugMode) Trace.WriteLine("Old Hottab Version, Hottab Mode(0).");
+            //    bResult = ModeOpen(0); // Hottab Mode(Old Hottab : Only Hottab Mode)
+            // }
+            if (TestProduct.Equals("FMB8"))
+            {
+                if (IsDebugMode) Trace.WriteLine("Keyboard Mode - Standard Mode(1).");
+                bResult = ModeOpen(1); // Standard Mode
+            }
+            else
+            {
+                if (IsDebugMode) Trace.WriteLine("Keyboard Mode - Consumer Mode(2).");
+                bResult = ModeOpen(2); // Consumer Mode
+            }
+
+#else
+            bResult = true;
+#endif
+            /*
+            int iCount = 0;
+            do
+            {
+                bResult = WinIO_WriteCommand(0x5C, 2);
+                ++iCount;
+                if (!bResult) Sleep(100);
+            } while (bResult == false);
+            */
             return bResult;
         }
 
@@ -1065,85 +1102,6 @@ namespace camera
             return iRet;
 
         }
-        public static bool InitMonitorControl()
-        {
-            if (IsDebugMode) Trace.WriteLine("InitMonitorControl()"); // Winmate Kenkun comment on 2014/12/08
-            bool bResult = false;
-            uint iTemp = 0;
-
-            try
-            {
-                MonitorControl mControl = new MonitorControl();
-
-                if (mControl.MonitorControl_Load())
-                {
-                    for (int i = 0; i < mControl.BrightnessLength; i++) BrightnessListArray[i] = mControl.BrightnessListArray[i];
-                    BrightnessLength = mControl.BrightnessLength;
-                    WinIO_GetEC_BrightnessLength(out iTemp);
-                    if (IsDebugMode) Trace.WriteLine("WinIO_GetEC_BrightnessLength() : " + iTemp); // Winmate Kenkun comment on 2014/12/08
-                    iECBrightnessLength = (int)iTemp;
-
-                    bResult = true;
-                }
-                else
-                {
-                    if (IsDebugMode) Trace.WriteLine("MonitorControl_Load() Fail!"); // Winmate Kenkun comment on 2014/12/08
-                }
-            }
-            catch (Exception ex)
-            {
-                if (IsDebugMode) Trace.WriteLine("InitMonitorControl() Error Message : " + ex.Message); // Winmate Kenkun comment on 2014/12/08
-            }
-
-            if (bResult == false)
-            {
-                BrightnessLength = 11;
-                for (int i = 0; i < BrightnessLength; i++) BrightnessListArray[i] = (byte)(i * 10);
-            }
-
-            // if (IsDebugMode) Trace.WriteLine("InitMonitorControl() End"); // Winmate Kenkun comment on 2014/12/08
-            return bResult;
-        }
-        public static bool InitBrightness(IntPtr handle, uint uiBrightnessLevel)
-        {
-            if (IsDebugMode) Trace.WriteLine("InitBrightness()"); // Winmate Kenkun comment
-            bool bResult = false;
-
-            bResult = InitMonitorControl();
-
-            switch (OSName)
-            {
-                case "VISTA":
-                    bIsShowBrightness = true;
-                    uiECBrightness = 15;    // Initialize None
-                    uiPMBrightness = 15;    // Initialize None
-                    iSkipNotifyECBrightness = 0;
-                    iSkipNotifyPMBrightness = 0;
-#if IsInstallHotTab
-                    if (IsDebugMode) Trace.WriteLine("RegisterDisplayBrightnessEventV()");// Winmate Kenkun comment on 2014/12/08
-                    bResult = RegisterDisplayBrightnessEventV(handle);
-                    // if (IsDebugMode) Trace.WriteLine("RegisterDisplayBrightnessEventV() End");// Winmate Kenkun comment on 2014/12/08
-#endif
-                    // bResult = HotTabDLL.SetBrightness(uiBrightnessLevel);
-                    // GlobalVariable.DebugMessage("winmate", "RegisterDisplayBrightnessEventV [" + bResult.ToString() + "]", GlobalVariable.bDebug);// brian add
-                    break;
-            }
-            // GlobalVariable.DebugMessage("winmate", "InitBrightness end [" + bResult.ToString() + "]", GlobalVariable.bDebug);// brian add
-            // if (IsDebugMode) Trace.WriteLine("InitBrightness() End");// Winmate Kenkun comment on 2014/12/08
-            return bResult;
-        }
-
-        public static bool DeinitBrightness()
-        {
-            bool bResult = false;
-            switch (OSName)
-            {
-                case "VISTA":
-                    bResult = UnregisterDisplayBrightnessEventV();
-                    break;
-            }
-            return bResult;
-        }
 
         public static bool SetBrightness(uint bValue)
         {
@@ -1354,87 +1312,6 @@ namespace camera
             return bResult;
         }
 
-        #endregion
-
-        #region ScreenRotation
-        // Winmate Kenkun modify on 2014/05/09
-        public static bool HotKey_ScreenRotation(uint rotationAngle)
-        {
-            bool bRet = false;
-            uint iTemp = 0;
-
-            bRet = OK1_Current_OSDirection(out iTemp);
-            if (bRet) iTemp = iTemp * 90;
-
-            bIsScreenRotating = true;
-
-            if ((iTemp != rotationAngle) || (bRet == false))
-            {
-                // keybd_event(0xA2, 0, 0x00, 0); // ctrl down
-                // keybd_event(0xA4, 0, 0x00, 0); // alt down
-                switch (rotationAngle)
-                {
-                    case 0: // up
-                        // keybd_event(0x26, 0, 0x00, 0); // up key down
-                        // keybd_event(0x26, 0, 0x02, 0); // up key up
-                        MonitorControl.RotationDisplayMode(0, MonitorControl.RotationDisplay.DMDO_DEFAULT, false);
-                        break;
-                    case 90: // left
-                        // keybd_event(0x25, 0, 0x00, 0); // left down
-                        // keybd_event(0x25, 0, 0x02, 0); // left up
-                        MonitorControl.RotationDisplayMode(0, MonitorControl.RotationDisplay.DMDO_90, false);
-                        break;
-                    case 180: // down
-                        // keybd_event(0x28, 0, 0x00, 0); // left down
-                        // keybd_event(0x28, 0, 0x02, 0); // left up
-                        MonitorControl.RotationDisplayMode(0, MonitorControl.RotationDisplay.DMDO_180, false);
-                        break;
-                    case 270: // right
-                        // keybd_event(0x27, 0, 0x00, 0); // left down
-                        // keybd_event(0x27, 0, 0x02, 0); // left up
-                        MonitorControl.RotationDisplayMode(0, MonitorControl.RotationDisplay.DMDO_270, false);
-                        break;
-                }
-                // keybd_event(0xA2, 0, 0x02, 0); // ctrl up
-                // keybd_event(0xA4, 0, 0x02, 0); // alt up
-            }
-            bIsScreenRotating = false;
-            return true;
-        }
-
-        public static bool OK1_Current_OSDirection(out uint iTmp)
-        {
-            iTmp = 0;
-
-            Type t = typeof(System.Windows.Forms.SystemInformation);
-            PropertyInfo[] pi = t.GetProperties();
-            for (int i = 0; i < pi.Length; i++)
-            {
-                if (pi[i].Name == "ScreenOrientation")
-                {
-                    object propval = pi[i].GetValue(SystemInformation.PowerStatus, null);
-                    switch (propval.ToString())
-                    {
-                        case "Angle0":
-                            iTmp = 0;
-                            break;
-                        case "Angle90":
-                            iTmp = 1;
-                            break;
-                        case "Angle180":
-                            iTmp = 2;
-                            break;
-                        case "Angle270":
-                            iTmp = 3;
-                            break;
-                        default:
-                            return false;
-                    }
-                    return true;
-                }
-            }
-            return false;
-        }
         #endregion
 
         #region BatteryInfo

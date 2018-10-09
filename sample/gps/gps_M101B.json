@@ -1,0 +1,10 @@
+{
+  "name": "gps_m101b",
+  "TestProduct": "IB80",
+  "IsTablet": true,
+  "WithoutPositioning": 0,
+  "PowerOnOffGPS": true,
+  "SNRAvgTolerance": 38,
+  "PortAddressGPS": "COM9",
+  "ShowWindow": false
+}

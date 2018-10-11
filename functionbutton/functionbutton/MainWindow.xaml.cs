@@ -33,7 +33,6 @@ namespace functionbutton
         private bool down;
         private bool done;
         private bool hidden;
-        private int i;
 
         public ViewModel()
         {
@@ -240,6 +239,7 @@ namespace functionbutton
                 Trace.WriteLine("FunctionButton Result : " + testResult);
                 if (testResult.Equals("PASS"))
                 {
+                   
                     result["result"] = "PASS";
                 }
                 else
@@ -251,7 +251,7 @@ namespace functionbutton
                 Thread.Sleep(200);
                 File.Create(GetFullPath("completed"));
                 Application.Current.Dispatcher.BeginInvokeShutdown(System.Windows.Threading.DispatcherPriority.Send);
-            });            
+            });
         }
 
         public bool WinIO_FunctionButtonLock()
@@ -487,17 +487,9 @@ namespace functionbutton
             return IntPtr.Zero;
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void FAIL_Click(object sender, RoutedEventArgs e)
         {
-            Application.Current.Shutdown();
-        }
-
-        private void Button1_Click(object sender, RoutedEventArgs e)
-        {
-            vm.Menu = true;
             checkTestStatus("FAIL");
-            Trace.WriteLine("123");
-            //Application.Current.Shutdown();
         }
     }
 }

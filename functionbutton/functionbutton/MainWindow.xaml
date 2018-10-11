@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:functionbutton"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" WindowState="Maximized" WindowStyle="None">
+        Title="MainWindow" Height="480" Width="640" WindowState="Maximized" WindowStyle="None">
 
     <Window.Resources>
         <Style TargetType="Label" x:Key="Pass">
@@ -54,11 +54,9 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Label Content="Menu" Grid.Column="8" Grid.Row="9">
+        <Label Content="Menu" Grid.Column="8" Grid.Row="7" Grid.ColumnSpan="2">
             <Label.Style>
                 <Style TargetType="Label" BasedOn="{StaticResource Pass}">
                     <Style.Triggers>
@@ -70,7 +68,7 @@
             </Label.Style>
         </Label>
 
-        <Label Content="Fn1" Grid.Column="7" Grid.Row="9">
+        <Label Content="Fn1" Grid.Column="6" Grid.Row="7" Grid.ColumnSpan="2">
             <Label.Style>
                 <Style TargetType="Label" BasedOn="{StaticResource Pass}">
                     <Style.Triggers>
@@ -82,7 +80,7 @@
             </Label.Style>
         </Label>
 
-        <Label Content="Fn2" Grid.Column="14" Grid.Row="2">
+        <Label Content="Fn2" Grid.Column="10" Grid.Row="1" Grid.ColumnSpan="2">
             <Label.Style>
                 <Style TargetType="Label" BasedOn="{StaticResource Pass}">
                     <Style.Triggers>
@@ -97,7 +95,7 @@
             </Label.Style>
         </Label>
 
-        <Label Content="Up" Grid.Column="14" Grid.Row="3">
+        <Label Content="Up" Grid.Column="10" Grid.Row="2" Grid.ColumnSpan="2">
             <Label.Style>
                 <Style TargetType="Label" BasedOn="{StaticResource Pass}">
                     <Style.Triggers>
@@ -112,7 +110,7 @@
             </Label.Style>
         </Label>
 
-        <Label Content="Down" Grid.Column="14" Grid.Row="4">
+        <Label Content="Down" Grid.Column="10" Grid.Row="3" Grid.ColumnSpan="2">
             <Label.Style>
                 <Style TargetType="Label" BasedOn="{StaticResource Pass}">
                     <Style.Triggers>
@@ -127,7 +125,7 @@
             </Label.Style>
         </Label>
 
-        <!--<Button Content="PASS" Click="Button_Click" BorderThickness="1" Foreground="Green" Background="LightGray" FontSize="30" Grid.Row="2" Grid.Column="1"/>-->
-        <!--<Button Content="FAIL" Click="Button1_Click" BorderThickness="1" Foreground="Red" Background="LightGray" FontSize="30" Grid.Row="2" Grid.Column="3" Grid.ColumnSpan="2"/>-->
+        <Button Content="FAIL" Click="FAIL_Click" Grid.ColumnSpan="2" BorderThickness="1" Foreground="Red" Background="LightGray" FontSize="38" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+        <Label Content="FunctionButton" Grid.ColumnSpan="5" FontSize="34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
     </Grid>
 </Window>

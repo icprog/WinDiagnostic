@@ -1,0 +1,12 @@
+{
+  "name": "audiojack_m101b",
+  "IsAutoModeAudioJack": true,
+  "TestProduct": "IB80",
+  "ExternalRecordThreshold": 2000,
+  "InternalRecordThreshold": 3000,
+  "AudioJackRecordThreshold": 20000,
+  "MachineAudioDevice": ["d5a47fa8-6d98-11d1-a21a-00a0c9223196"],
+  "ExternalAudioDevice": ["4e1cf13f-1679-463b-a72f-a5bf64c86eba"],
+  "DigitalMicDevice": ["4e1cf261-1679-463b-a72f-a5bf64c86eba"],
+  "FanRecordDeviceList": ["4e1cf13f-1679-463b-a72f-a5bf64c86eba"]
+}

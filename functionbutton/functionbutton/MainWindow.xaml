@@ -19,15 +19,6 @@
                 </Trigger>
             </Style.Triggers>-->
         </Style>
-    
-        <Style x:Key="BtnInfoStyle" TargetType="Button">
-        <Setter Property="Width" Value="70"/>
-        <Setter Property="Height" Value="25"/>
-        <Setter Property="Foreground" Value="White"/>
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="Background" Value="Red"/>
-        
-    </Style>
     </Window.Resources>
 
     <Grid ShowGridLines="False">
@@ -125,7 +116,8 @@
             </Label.Style>
         </Label>
 
-        <Button Content="FAIL" Click="FAIL_Click" Grid.ColumnSpan="2" BorderThickness="1" Foreground="Red" Background="LightGray" FontSize="38" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-        <Label Content="FunctionButton" Grid.ColumnSpan="5" FontSize="34" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+        <Button Style="{DynamicResource Fail}" Click="FAIL_Click"/>
+        <Label Style="{StaticResource TestItem}" Content="FunctionButton"/>
+        
     </Grid>
 </Window>

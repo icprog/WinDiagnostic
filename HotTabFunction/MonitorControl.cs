@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Management;
-using System.Runtime.InteropServices;
 using System.Text;
-using System.Windows.Forms;
+using System.Runtime.InteropServices;
 
-namespace camera
+using System.Windows.Forms;
+using System.Management;
+using System.Diagnostics;
+
+namespace HotTabFunction
 {
-    class MonitorControl
+    // Brightness 和 Rotation
+    public class MonitorControl
     {
         #region Windows API
         [DllImport("user32.dll")]
@@ -19,7 +20,7 @@ namespace camera
         static extern int ChangeDisplaySettingsEx2(object lpszDeviceName, object lpDevMode, object hwnd, uint dwflags, object lParam);
 
         [DllImport("user32.dll", EntryPoint = "EnumDisplaySettings")]
-        static extern bool EnumDisplaySettings(string lpszDeviceName, Int32 iModeNum, ref DEVMODE lpDevMode);
+        static extern bool EnumDisplaySettings(string lpszDeviceName, Int32 iModeNum, ref   DEVMODE lpDevMode);
 
         [DllImport("user32.dll")]
         static extern bool EnumDisplayDevices(string lpDevice, uint iDevNum, ref DISPLAY_DEVICE lpDisplayDevice, uint dwFlags);
@@ -39,7 +40,7 @@ namespace camera
 
         [DllImport("kernel32.dll", SetLastError = true)]
         static extern IntPtr CreateFile(
-                                           [MarshalAs(UnmanagedType.LPStr)]
+                                           [MarshalAs(UnmanagedType.LPStr)] 
                                             string strName,
                                             uint nAccess,
                                             uint nShareMode,
@@ -321,19 +322,18 @@ namespace camera
         #endregion
 
         public static uint bDebug = 0;
-        bool IsDebugMode = true;
 
-        public void DebugMessage(string token, string msg)
+        public static void DebugMessage(string token, string msg)
         {
             if (bDebug == 1)
             {
-                if (IsDebugMode) Trace.WriteLine(token + " ==> " + msg);
+                if (HotTabDLL.IsDebugMode) Trace.WriteLine(token + " ==> " + msg);
             }
         }
 
         public bool MonitorControl_Load()
         {
-            if (IsDebugMode) Trace.WriteLine("MonitorControlLoad()");// Winmate Kenkun comment on 2014/12/08
+            if (HotTabDLL.IsDebugMode) Trace.WriteLine("MonitorControlLoad()");// Winmate Kenkun comment on 2014/12/08
 
             uint DisplayIndex = 0;
 
@@ -347,9 +347,9 @@ namespace camera
                 DisplayIndex++;
             }
 
-            if (DisplayIndex == 0) return false;
-            // if (IsDebugMode) Trace.WriteLine("MonitorControl_Load false DisplayIndex");// Winmate Kenkun comment on 2014/12/08
-
+            if (DisplayIndex == 0) return false; 
+            // if (HotTabDLL.IsDebugMode) Trace.WriteLine("MonitorControl_Load false DisplayIndex");// Winmate Kenkun comment on 2014/12/08
+ 
             DisplayIndex = 0;
 
             DeviceList = DeviceList.Remove(DeviceList.Length - 1, 1);// brian
@@ -357,17 +357,17 @@ namespace camera
 
             GetWindowsVersion(out OSVer);
 
-            if (!InitalBraklightFunction(OSVer.dwMajorVersion, DisplayIndex)) return false;
-            // if (IsDebugMode) Trace.WriteLine("MonitorControl_Load InitalBraklightFunction");// Winmate Kenkun comment on 2014/12/08
+            if (!InitalBraklightFunction(OSVer.dwMajorVersion, DisplayIndex)) return false; 
+            // if (HotTabDLL.IsDebugMode) Trace.WriteLine("MonitorControl_Load InitalBraklightFunction");// Winmate Kenkun comment on 2014/12/08
 
-            // if (IsDebugMode) Trace.WriteLine("MonitorControl_Load() End");// Winmate Kenkun comment on 2014/12/08
+            // if (HotTabDLL.IsDebugMode) Trace.WriteLine("MonitorControl_Load() End");// Winmate Kenkun comment on 2014/12/08
             return true;
         }
 
 
         private bool GetWindowsVersion(out OSVERSIONFOEX OSVersion)
         {
-            if (IsDebugMode) Trace.WriteLine("Get Windows Version");
+            if (HotTabDLL.IsDebugMode) Trace.WriteLine("Get Windows Version");
             OSVersion = new OSVERSIONFOEX();
             OSVersion.dwOSVersionInfoSize = Marshal.SizeOf(OSVersion);
             bool Ret = GetVersionEx(ref OSVersion);
@@ -380,7 +380,7 @@ namespace camera
             hDevice = CreateFile(
                             "\\\\.\\LCD",                           // open LCD device   @\\.\LCD or \\\\.\LCD                      
                             GENERIC_READ | GENERIC_WRITE,           // no access to the drive
-                                                                    // FILE_SHARE_READ | FILE_SHARE_WRITE,     // share mode
+                         // FILE_SHARE_READ | FILE_SHARE_WRITE,     // share mode
                             FILE_ANY_ACCESS,
                             IntPtr.Zero,                            // default security attributes
                             OPEN_EXISTING,                          // disposition
@@ -419,7 +419,7 @@ namespace camera
 
             if ((int)(hDevice = OpenLCDDevice()) == -1)
             {
-                // ShowDialogMessageBox("找不到LCD介面!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                // HotTabDLL.ShowDialogMessageBox("找不到LCD介面!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 DebugMessage("winmate", "LCD not found");
                 return false;
             }
@@ -431,7 +431,7 @@ namespace camera
                     Ret = GetDisplayBrightness(hDevice, ref NowBrightness);
                     if (Ret == false)
                     {
-                        // ShowDialogMessageBox("Error Code:" + Marshal.GetLastWin32Error().ToString(), "Get Display Brightness!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        // HotTabDLL.ShowDialogMessageBox("Error Code:" + Marshal.GetLastWin32Error().ToString(), "Get Display Brightness!", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
 
                     if (NowBrightness.DisplayPolicy == 0x01) BacklightPercentage = NowBrightness.ACBRightness;
@@ -454,7 +454,7 @@ namespace camera
                 Ret = QueryDisplayState(hDevice, out BacklightIndex, out lpByte);
                 if (Ret == false)
                 {
-                    // ShowDialogMessageBox("Error Code:" + Marshal.GetLastWin32Error().ToString(), "Query Display State!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    // HotTabDLL.ShowDialogMessageBox("Error Code:" + Marshal.GetLastWin32Error().ToString(), "Query Display State!", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 else
                 {
@@ -475,7 +475,7 @@ namespace camera
                     DebugMessage("winmate", "BrightnessList = " + BrightnessList);
                     BrightnessList = BrightnessList.Remove(BrightnessList.Length - 1, 1);
                     UpdateBrightnessTable(BrightnessList);
-
+               
                     if (lpByte > 0)
                     {
                         // BacklightLevel.SelectedIndex = (int)DisplayIndex;
@@ -490,7 +490,7 @@ namespace camera
         }
         private bool UpdateBrightnessTable(string BrightnessTableStirng)// brian
         {
-            // ShowDialogMessageBox(BrightnessTableStirng);
+            // HotTabDLL.ShowDialogMessageBox(BrightnessTableStirng);
 
             string[] buf;
             int i, len;
@@ -504,14 +504,14 @@ namespace camera
 
             byte[] BrightnessArray = new byte[len];
 
-            // ShowDialogMessageBox("Len:" + len);
-
+            // HotTabDLL.ShowDialogMessageBox("Len:" + len);
+          
             for (i = 0; i < len; i++)
             {
                 BrightnessArray[i] = Convert.ToByte(buf[i]);
-                // ShowDialogMessageBox(i.ToString() + ":" + BrightnessArray[i]);
+                // HotTabDLL.ShowDialogMessageBox(i.ToString() + ":" + BrightnessArray[i]);
             }
-
+           
             for (i = 0; i < len; i++)
             {
                 BrightnessListArray[i] = BrightnessArray[i];
@@ -574,7 +574,7 @@ namespace camera
         }
         private bool UpdateDeviceTable(string DeviceStirng)// brian
         {
-            // ShowDialogMessageBox(DeviceStirng);
+            // HotTabDLL.ShowDialogMessageBox(DeviceStirng);
             string[] buf;
             int i, len;
 
@@ -590,7 +590,7 @@ namespace camera
 
         private bool GetDisplayBrightness(IntPtr hDevice, ref DISPLAY_BRIGHTNESS DB)
         {
-            if (IsDebugMode) Trace.WriteLine("GetDisplayBrightness");
+            if (HotTabDLL.IsDebugMode) Trace.WriteLine("GetDisplayBrightness");
             IntPtr DBBuffer = IntPtr.Zero;
             uint lpByte;
             byte[] DataBuffer = new byte[4];

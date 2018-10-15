@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace rotation
+namespace HotTabFunction
 {
     public class KeyboardHookEventArgs : EventArgs
     {

@@ -8,15 +8,14 @@ using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Runtime.CompilerServices;
 
-namespace rotation
+namespace HotTabFunction
 {
     // 主要用途為Rotation和Information
-    class HotTabWMIInformation
+    public class HotTabWMIInformation
     {
         private static ConnectionOptions connectionOptions;
         private static ManagementScope managementScope;
-        bool IsDebugMode = true;
-        string SmbiosProductName = "";
+        static string SmbiosProductName = string.Empty;
 
         public HotTabWMIInformation()
         {
@@ -49,7 +48,7 @@ namespace rotation
         /// </summary>
         /// <returns></returns>
         // Winmate Kenkun modify on 2016/03/22 >>
-        public string GetWMI_BIOSVersion()
+        public static string GetWMI_BIOSVersion()
         {
             bool bflag = false;
             int iCount = 0;
@@ -74,7 +73,7 @@ namespace rotation
                         SMBIOSBIOSVersion = (string)managementObject["SMBIOSBIOSVersion"];
                     }
 
-                    if (IsDebugMode) Trace.WriteLine("Win32_BIOS ReleaseDate : " + BIOSReleaseDate + " , Manufacturer : " + BIOManufacturer + " , Version : " + SMBIOSBIOSVersion + "\r\n");
+                    if (HotTabDLL.IsDebugMode) Trace.WriteLine("Win32_BIOS ReleaseDate : " + BIOSReleaseDate + " , Manufacturer : " + BIOManufacturer + " , Version : " + SMBIOSBIOSVersion + "\r\n");
                     bflag = true;
                 }
 
@@ -91,7 +90,7 @@ namespace rotation
                         SMBIOSBIOSVersion = mObject["Version"].ToString();
                     }
 
-                    if (IsDebugMode)
+                    if (HotTabDLL.IsDebugMode)
                     {
                         Trace.WriteLine("Product is not support SMBIOS 3.0 spec. Read BaseBoard Version.");
                     }
@@ -131,7 +130,7 @@ namespace rotation
         /// https:// msdn.microsoft.com/en-us/library/windows/desktop/aa394105(v=vs.85).aspx
         /// </summary>
         /// <returns></returns>
-        public string GetWMI_BIOSMainBoard()
+        public static String GetWMI_BIOSMainBoard()
         {
             SelectQuery selectQuery = new SelectQuery("SELECT * FROM Win32_ComputerSystemProduct");
             ManagementObjectSearcher managementObjectSearch = new ManagementObjectSearcher(managementScope, selectQuery);
@@ -140,7 +139,7 @@ namespace rotation
             foreach (ManagementObject managementObject in managementObjectCollection)
             {
                 SmbiosProductName = (string)managementObject["Name"];
-                if (IsDebugMode)
+                if (HotTabDLL.IsDebugMode)
                 {
                     /*
                     Trace.WriteLine("ComputerSystemProduct Caption : " + managementObject["Caption"].ToString());
@@ -254,7 +253,7 @@ namespace rotation
                     foreach (ManagementObject mObject in moCollection)
                     {
                         long FileSize = mObject["FileSize"] == null ? 0 : long.Parse(mObject["FileSize"].ToString()); // 分頁檔大小
-                        if (IsDebugMode)
+                        if (HotTabDLL.IsDebugMode)
                         {
                             Trace.WriteLine("Win32_PageFile FileSize : " + (FileSize / 1024 / 1024).ToString("#0.00") + "G");
                             Trace.WriteLine("Win32_PageFile Name : " + mObject["Name"].ToString());
@@ -288,7 +287,7 @@ namespace rotation
                 catch (Exception ex)
                 {
                     throw ex;
-                    // ShowDialogMessageBox("Error");
+                    // HotTabDLL.ShowDialogMessageBox("Error");
                 }
             }
             return batteryInformation;

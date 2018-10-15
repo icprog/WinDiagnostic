@@ -1,16 +1,20 @@
-Ôªøusing System;
+// #define IsInstallHotTab
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO.Ports;
-using System.Linq;
 using System.Management;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Text;
 using System.Windows.Forms;
 
-namespace camera
+namespace HotTabFunction
 {
+    /// <summary>
+    /// 
+    /// </summary>
+
     enum GSensor_Orientation : int
     {
         Orientation_Left = 0,
@@ -21,7 +25,7 @@ namespace camera
         Orientation_Bottom
     }
 
-    class HotTabDLL
+    public class HotTabDLL
     {
         #region Const&Enumeration Declare
 
@@ -198,8 +202,8 @@ namespace camera
 
         public static bool bIsReadingEC = false;
         public static bool bIsBrightnessReadingEC = false;
+        public static bool IsDebugMode = true;
 
-        static bool IsDebugMode = true;
         #endregion
 
         #region User32 DLL Declare For All
@@ -294,7 +298,7 @@ namespace camera
         #endregion
 
         #region Winmate MCU DLL Declare by oliver
-        [DllImport(@"DaimlerMCU.dll", EntryPoint = "MCUConnect")]
+        [DllImport(@"DaimlerMCU.dll",EntryPoint = "MCUConnect")]
         public static extern int DeviceConnect(int baud, int port);
 
         [DllImport(@"DaimlerMCU.dll", EntryPoint = "MCUDisconnect")]
@@ -404,10 +408,10 @@ namespace camera
         // public static FormDebug formDebug = new FormDebug();
 
 
-        #region Battery - BTZ1 / IH83 / M9020B Â∞àÁî® ( ÈõôMBAT )
+        #region Battery - BTZ1 / IH83 / M9020B ±M•Œ ( ¬˘MBAT )
         public static bool GetBatteryCurrentDischarge(out byte bValue)
         {
-            // Âà§Êñ∑Áï∂ÂâçÊîæÈõªÁöÑÈõªÊ±†ÊòØÂì™È°Ü 0x02 = Â§ñÈÉ®  0x01 = ÂÖßÈÉ®
+            // ßP¬_∑Ì´e©Òπq™∫πq¶¿¨O≠˛¡˚ 0x02 = •~≥°  0x01 = §∫≥°
             uint data = 0;
             bool bResult = false;
             int iCount = 0;
@@ -431,10 +435,10 @@ namespace camera
 
         public static bool WinIO_SetHotSwap()
         {
-            // ÈÄ≤Ë°åÈõªÊ±†ÊîæÈõªÂàáÊèõ
+            // ∂i¶Êπq¶¿©Òπq§¡¥´
             if (bIsBrightnessReadingEC)
             {
-                // if (IsDebugMode) Trace.WriteLine("perry bIsBrightnessReadingEC = true");
+                // if (HotTabDLL.IsDebugMode) Trace.WriteLine("perry bIsBrightnessReadingEC = true");
                 return false;
             }
             bool bResult = false;
@@ -448,7 +452,7 @@ namespace camera
             } while (bResult == false && iCount < 4);
 
             return bResult;
-        }
+        } 
         #endregion
 
 
@@ -497,6 +501,43 @@ namespace camera
             return bResult;
         }
 
+        public static bool WinIO_FunctionButtonLock()
+        {
+            bool bResult = false;
+
+#if IsInstallHotTab
+            // Winmate Kenkun remove on 2015/09/09
+            // if (HotTabDLL.IsOldHottabVersion) 
+            // {
+            //    if (HotTabDLL.IsDebugMode) Trace.WriteLine("Old Hottab Version, Hottab Mode(0).");
+            //    bResult = ModeOpen(0); // Hottab Mode(Old Hottab : Only Hottab Mode)
+            // }
+            if (HotTabDLL.TestProduct.Equals("FMB8"))
+            {
+                if (HotTabDLL.IsDebugMode) Trace.WriteLine("Keyboard Mode - Standard Mode(1).");
+                bResult = ModeOpen(1); // Standard Mode
+            }
+            else
+            {
+                if (HotTabDLL.IsDebugMode) Trace.WriteLine("Keyboard Mode - Consumer Mode(2).");
+                bResult = ModeOpen(2); // Consumer Mode
+            }
+
+#else
+            bResult = true;
+#endif
+            /*
+            int iCount = 0;
+            do
+            {
+                bResult = WinIO_WriteCommand(0x5C, 2);
+                ++iCount;
+                if (!bResult) Sleep(100);
+            } while (bResult == false);
+            */
+            return bResult;
+        }
+
         // Winmate Kenkun modify on 2014/12/19
         // Get EC All String
         /* public static bool WinIO_GetEC(out string version)
@@ -521,7 +562,7 @@ namespace camera
             if ((bValue < 0x20) || (bValue > 0x7A)) bValue = 0x5F;
             version += Convert.ToChar(bValue).ToString();
             
-            // V, C Ê®ôÊ∫ñÂìÅ, ÂÆ¢Ë£ΩÂìÅ
+            // V, C º–∑«´~, ´»ªs´~
             WinIO_ReadFromECSpace(0x04, out bValue);
             if ((bValue < 0x20) || (bValue > 0x7A)) bValue = 0x5F;
             version += Convert.ToChar(bValue).ToString();
@@ -539,8 +580,8 @@ namespace camera
             if ((bValue < 0x20) || (bValue > 0x7A)) bValue = 0x5F;
             version += Convert.ToChar(bValue).ToString();
 
-            // Áï∂EC define MINOR_VERSION (1-4ÂÄãÂ≠óÂÖÉ), Â¶Ç‰∏Ä‰∫õÂÆ¢Ë£ΩÁâàÊú¨ÊàñÊòØFMB80, Winmate kenknu modfiy on 2016/11/23
-            // if (TestProduct.Equals("FMB8") || TestProduct.Equals("IH83"))
+            // ∑ÌEC define MINOR_VERSION (1-4≠”¶r§∏), ¶p§@®«´»ªs™©•ª©Œ¨OFMB80, Winmate kenknu modfiy on 2016/11/23
+            // if (HotTabDLL.TestProduct.Equals("FMB8") || HotTabDLL.TestProduct.Equals("IH83"))
             // {
                 WinIO_ReadFromECSpace(0x08, out bValue);
                 if ((bValue < 0x20) || (bValue > 0x7A)) bValue = 0x5F;
@@ -561,9 +602,9 @@ namespace camera
 
             version.Trim();
 
-            if (IsDebugMode) Trace.WriteLine("WinIO_GetEC() : " + version + " , Length : " + version.Length);
+            if (HotTabDLL.IsDebugMode) Trace.WriteLine("WinIO_GetEC() : " + version + " , Length : " + version.Length);
             return true;
-        } */
+        } */ 
 
         // Get MB Version
         public static bool WinIO_GetECMBVersion(out string version)
@@ -587,7 +628,7 @@ namespace camera
             if ((bValue < 0x20) || (bValue > 0x7A)) bValue = 0x5F;
             version += Convert.ToChar(bValue).ToString();
 
-            if (IsDebugMode) Trace.WriteLine("WinIO_GetECMBVersion() : " + version);
+            if (HotTabDLL.IsDebugMode) Trace.WriteLine("WinIO_GetECMBVersion() : " + version);
             return true;
         }
 
@@ -609,7 +650,7 @@ namespace camera
             if ((bValue < 0x20) || (bValue > 0x7A)) bValue = 0x5F;
             version += Convert.ToChar(bValue).ToString();
 
-            // if (IsDebugMode) Trace.WriteLine("WinIO_GetECVersion() : " + version);
+            // if (HotTabDLL.IsDebugMode) Trace.WriteLine("WinIO_GetECVersion() : " + version);
             return true;
         }
 
@@ -640,7 +681,7 @@ namespace camera
                 bValue = 0x5F;
             version += Convert.ToChar(bValue).ToString();
 
-            if (IsDebugMode) Trace.WriteLine("WinIO_GetECSubVersion() : " + version);
+            if (HotTabDLL.IsDebugMode) Trace.WriteLine("WinIO_GetECSubVersion() : " + version);
             return true;
         }
 
@@ -816,11 +857,11 @@ namespace camera
 
             return true;
         }
-
+       
         // Wireless State
         // public static bool WinIO_SetWirelessState(uint bValue)
 
-        public static bool WinIO_SetDeviceState(uint bValue) // ‰∏çÊáâË©≤Âè™ÊòØÊéßÂà∂WirelessËÄåÊòØÊï¥ÂÄãDevice Winmate Kenkun modify on 2014/11/04
+        public static bool WinIO_SetDeviceState(uint bValue) // §£¿≥∏”•u¨O±±®ÓWireless¶”¨Oæ„≠”Device Winmate Kenkun modify on 2014/11/04
         {
             bool ret = false;
 #if IsInstallHotTab
@@ -921,8 +962,8 @@ namespace camera
 
         public static bool CheckComExist(string stCOM)
         {
-            bool bRet = false; // ComportÊòØÂê¶Â≠òÂú®
-            bool bPortOpen = false; // ComportÊòØÂê¶Ë¢´Âç†‰Ωè
+            bool bRet = false; // Comport¨Oß_¶s¶b
+            bool bPortOpen = false; // Comport¨Oß_≥Q•e¶Ì
             SerialPort serialComport = new SerialPort();
 
             string[] ports = SerialPort.GetPortNames();
@@ -933,7 +974,7 @@ namespace camera
                 {
                     if (stCOM == sName)
                     {
-                        if (IsDebugMode) Trace.WriteLine("CheckComExist() - BarcodePort : " + sName);
+                        if (HotTabDLL.IsDebugMode) Trace.WriteLine("CheckComExist() - BarcodePort : " + sName);
                         bRet = true;
                     }
                 }
@@ -949,7 +990,7 @@ namespace camera
                 }
                 catch (Exception ex)
                 {
-                    if (IsDebugMode) Trace.WriteLine("CheckComExist() - Open Exception : " + ex.Message);
+                    if (HotTabDLL.IsDebugMode) Trace.WriteLine("CheckComExist() - Open Exception : " + ex.Message);
                     bPortOpen = false;
                 }
 
@@ -962,7 +1003,7 @@ namespace camera
                     }
                     catch (Exception ex)
                     {
-                        if (IsDebugMode) Trace.WriteLine("CheckComExist() - Close Exception : " + ex.Message);
+                        if (HotTabDLL.IsDebugMode) Trace.WriteLine("CheckComExist() - Close Exception : " + ex.Message);
                         bPortOpen = false;
                     }
                 }
@@ -1067,7 +1108,7 @@ namespace camera
         }
         public static bool InitMonitorControl()
         {
-            if (IsDebugMode) Trace.WriteLine("InitMonitorControl()"); // Winmate Kenkun comment on 2014/12/08
+            if (HotTabDLL.IsDebugMode) Trace.WriteLine("InitMonitorControl()"); // Winmate Kenkun comment on 2014/12/08
             bool bResult = false;
             uint iTemp = 0;
 
@@ -1080,19 +1121,19 @@ namespace camera
                     for (int i = 0; i < mControl.BrightnessLength; i++) BrightnessListArray[i] = mControl.BrightnessListArray[i];
                     BrightnessLength = mControl.BrightnessLength;
                     WinIO_GetEC_BrightnessLength(out iTemp);
-                    if (IsDebugMode) Trace.WriteLine("WinIO_GetEC_BrightnessLength() : " + iTemp); // Winmate Kenkun comment on 2014/12/08
+                    if (HotTabDLL.IsDebugMode) Trace.WriteLine("WinIO_GetEC_BrightnessLength() : " + iTemp); // Winmate Kenkun comment on 2014/12/08
                     iECBrightnessLength = (int)iTemp;
 
                     bResult = true;
                 }
                 else
                 {
-                    if (IsDebugMode) Trace.WriteLine("MonitorControl_Load() Fail!"); // Winmate Kenkun comment on 2014/12/08
+                    if (HotTabDLL.IsDebugMode) Trace.WriteLine("MonitorControl_Load() Fail!"); // Winmate Kenkun comment on 2014/12/08
                 }
             }
             catch (Exception ex)
             {
-                if (IsDebugMode) Trace.WriteLine("InitMonitorControl() Error Message : " + ex.Message); // Winmate Kenkun comment on 2014/12/08
+                if (HotTabDLL.IsDebugMode) Trace.WriteLine("InitMonitorControl() Error Message : " + ex.Message); // Winmate Kenkun comment on 2014/12/08
             }
 
             if (bResult == false)
@@ -1101,12 +1142,12 @@ namespace camera
                 for (int i = 0; i < BrightnessLength; i++) BrightnessListArray[i] = (byte)(i * 10);
             }
 
-            // if (IsDebugMode) Trace.WriteLine("InitMonitorControl() End"); // Winmate Kenkun comment on 2014/12/08
+            // if (HotTabDLL.IsDebugMode) Trace.WriteLine("InitMonitorControl() End"); // Winmate Kenkun comment on 2014/12/08
             return bResult;
         }
         public static bool InitBrightness(IntPtr handle, uint uiBrightnessLevel)
         {
-            if (IsDebugMode) Trace.WriteLine("InitBrightness()"); // Winmate Kenkun comment
+            if (HotTabDLL.IsDebugMode) Trace.WriteLine("InitBrightness()"); // Winmate Kenkun comment
             bool bResult = false;
 
             bResult = InitMonitorControl();
@@ -1120,16 +1161,16 @@ namespace camera
                     iSkipNotifyECBrightness = 0;
                     iSkipNotifyPMBrightness = 0;
 #if IsInstallHotTab
-                    if (IsDebugMode) Trace.WriteLine("RegisterDisplayBrightnessEventV()");// Winmate Kenkun comment on 2014/12/08
+                    if (HotTabDLL.IsDebugMode) Trace.WriteLine("RegisterDisplayBrightnessEventV()");// Winmate Kenkun comment on 2014/12/08
                     bResult = RegisterDisplayBrightnessEventV(handle);
-                    // if (IsDebugMode) Trace.WriteLine("RegisterDisplayBrightnessEventV() End");// Winmate Kenkun comment on 2014/12/08
+                    // if (HotTabDLL.IsDebugMode) Trace.WriteLine("RegisterDisplayBrightnessEventV() End");// Winmate Kenkun comment on 2014/12/08
 #endif
                     // bResult = HotTabDLL.SetBrightness(uiBrightnessLevel);
                     // GlobalVariable.DebugMessage("winmate", "RegisterDisplayBrightnessEventV [" + bResult.ToString() + "]", GlobalVariable.bDebug);// brian add
                     break;
             }
             // GlobalVariable.DebugMessage("winmate", "InitBrightness end [" + bResult.ToString() + "]", GlobalVariable.bDebug);// brian add
-            // if (IsDebugMode) Trace.WriteLine("InitBrightness() End");// Winmate Kenkun comment on 2014/12/08
+            // if (HotTabDLL.IsDebugMode) Trace.WriteLine("InitBrightness() End");// Winmate Kenkun comment on 2014/12/08
             return bResult;
         }
 
@@ -1147,7 +1188,7 @@ namespace camera
 
         public static bool SetBrightness(uint bValue)
         {
-            if (IsDebugMode) Trace.WriteLine("SetBrightness() : " + bValue); // Winmate Kenkun comment
+            if (HotTabDLL.IsDebugMode) Trace.WriteLine("SetBrightness() : " + bValue); // Winmate Kenkun comment
             // GlobalVariable.DebugMessage("winmate", "SetBrightness [" + bValue.ToString() + "]", // GlobalVariable.bDebug);
 
             bool bResult = false;
@@ -1160,14 +1201,14 @@ namespace camera
             if (uiPMBrightness != bValue)
             {
                 ++iSkipNotifyECBrightness;
-                // if (IsDebugMode) Trace.WriteLine("uiPMBrightness != bValue , BrightnessListArray[bValue] = " + BrightnessListArray[bValue]); // Winmate Kenkun comment
+                // if (HotTabDLL.IsDebugMode) Trace.WriteLine("uiPMBrightness != bValue , BrightnessListArray[bValue] = " + BrightnessListArray[bValue]); // Winmate Kenkun comment
                 // GlobalVariable.DebugMessage("winmate", "SetBrightness SetDisplayBrightnessV [" + bValue.ToString() + "]", // GlobalVariable.bDebug);
 #if IsInstallHotTab
                 bResult = SetDisplayBrightnessV(BrightnessListArray[bValue]);
 #endif
                 if (!bResult)
                 {
-                    if (IsDebugMode) Trace.WriteLine("SetWmiBrightness"); // Winmate Kenkun comment
+                    if (HotTabDLL.IsDebugMode) Trace.WriteLine("SetWmiBrightness"); // Winmate Kenkun comment
                     bResult = SetWmiBrightness((byte)(BrightnessListArray[bValue]));
                 }
                 // GlobalVariable.DebugMessage("winmate", "SetBrightness SetDisplayBrightnessV [" + bValue.ToString() + "]", // GlobalVariable.bDebug);
@@ -1175,7 +1216,7 @@ namespace camera
             bResult = true;
 
             // GlobalVariable.DebugMessage("winmate", "SetBrightness end ==>" + bResult.ToString(), // GlobalVariable.bDebug);
-            // if (IsDebugMode) Trace.WriteLine("SetBrightness() End"); // Winmate Kenkun comment
+            // if (HotTabDLL.IsDebugMode) Trace.WriteLine("SetBrightness() End"); // Winmate Kenkun comment
             return bResult;
         }
 
@@ -1463,7 +1504,7 @@ namespace camera
             return !ret;
         }
 
-
+       
         // For No Changer / Gauge IC Product, Winmate kenkun add on 2016/05/26 >>
         public static bool GetBattery2ChargingVoltage_NoGaugeIC(out int Value)
         {

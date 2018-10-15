@@ -5,7 +5,7 @@ using Microsoft.Win32;
 using System.Runtime.InteropServices;
 using System.IO;
 
-namespace rotation
+namespace HotTabFunction
 {
     public class HotTabRegistry
     {

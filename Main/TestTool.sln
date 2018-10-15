@@ -33,6 +33,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "gps", "..\gps\gps\gps.cspro
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "audiojack", "..\audiojack\audiojack\audiojack.csproj", "{E01A5AAF-BAEF-4694-B406-5F599AA6658B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "brightness", "..\brightness\brightness\brightness.csproj", "{94767976-AFC7-4E40-9E9C-049D86CE18E3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HotTabFunction", "..\HotTabFunction\HotTabFunction.csproj", "{A68E1CDB-6AFE-47E3-B36E-5CD76486322A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -99,6 +103,14 @@ Global
 		{E01A5AAF-BAEF-4694-B406-5F599AA6658B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E01A5AAF-BAEF-4694-B406-5F599AA6658B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E01A5AAF-BAEF-4694-B406-5F599AA6658B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{94767976-AFC7-4E40-9E9C-049D86CE18E3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{94767976-AFC7-4E40-9E9C-049D86CE18E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{94767976-AFC7-4E40-9E9C-049D86CE18E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{94767976-AFC7-4E40-9E9C-049D86CE18E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A68E1CDB-6AFE-47E3-B36E-5CD76486322A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A68E1CDB-6AFE-47E3-B36E-5CD76486322A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A68E1CDB-6AFE-47E3-B36E-5CD76486322A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A68E1CDB-6AFE-47E3-B36E-5CD76486322A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

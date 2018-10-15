@@ -1,15 +1,33 @@
-﻿using DirectShowLib;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
-using System.Windows.Forms;
+﻿/****************************************************************************
+While the underlying libraries are covered by LGPL, this sample is released 
+as public domain.  It is distributed in the hope that it will be useful, but 
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+or FITNESS FOR A PARTICULAR PURPOSE.  
+*****************************************************************************/
 
-namespace camera
+// HIRES Webcam  (Thomas Naiser, 2009) demonstrates how a high resolution Webcam  
+// like the Quickcam Pro 9000 with a resolution of 1600x1200 pixel can be controlled from a C# 
+// application (via Directshow). For application with other Webcams than the Quickcam Pro 9000 minor 
+// changes will be necessary.
+
+// The code of HIRES Webcam is based on CameraTest from Mark Deraeve
+// (which can be downloaded on http://www.dailycode.net/blog/page/Downloads.aspx)
+
+
+
+using System;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.Collections;
+using System.Runtime.InteropServices;
+using System.Threading;
+using System.Diagnostics;
+using System.Windows.Forms;
+using System.Collections.Generic;
+using DirectShowLib;
+using System.Text;
+
+namespace HotTabFunction
 {
     enum CameraDeviceIdList : int
     {
@@ -28,13 +46,13 @@ namespace camera
 
     /// <summary> Summary description for MainForm. </summary>
     public class HotTabCamera : ISampleGrabberCB, IDisposable
-    // internal class HotTabCamera : ISampleGrabberCB, IDisposable
+   // internal class HotTabCamera : ISampleGrabberCB, IDisposable
     {
         #region Member variables
 
         /// <summary> graph builder interface. </summary>
         private IFilterGraph2 m_FilterGraph = null;
-
+     
         // Used to snap picture on Still pin
         private IAMVideoControl m_VidControl = null;
         private IPin m_pinStill = null;
@@ -64,7 +82,7 @@ namespace camera
         #endregion
 
         #region APIs
-        [DllImport("Kernel32.dll", EntryPoint = "RtlMoveMemory")]
+        [DllImport("Kernel32.dll", EntryPoint="RtlMoveMemory")]
         private static extern void CopyMemory(IntPtr Destination, IntPtr Source, [MarshalAs(UnmanagedType.U4)] int Length);
         #endregion
 
@@ -266,8 +284,8 @@ namespace camera
         // Zero based device index and device params and output window
         public HotTabCamera(int iDeviceNum, int iWidth, int iHeight, short iBPP, Control hControl)
         {
-            DsDevice[] capDevices;
-
+            DsDevice [] capDevices;
+       
             // Get the collection of video devices
             capDevices = DsDevice.GetDevicesOfCat(FilterCategory.VideoInputDevice);
 
@@ -373,7 +391,7 @@ namespace camera
             try
             {
                 m_WantOne = true;
-
+                
                 // If we are using a still pin, ask for a picture
                 if (m_VidControl != null)
                 {
@@ -381,7 +399,7 @@ namespace camera
                 }
 
                 // Start waiting
-                if (!m_PictureReady.WaitOne(30000, false))
+                if ( ! m_PictureReady.WaitOne(30000, false) )
                 {
                     // throw new Exception("Timeout waiting to get picture");
                     // MainForm.ShowDialogMessageBox("Timeout waiting to get picture","Attention");
@@ -397,7 +415,7 @@ namespace camera
                 m_PictureReady.Set();
                 m_WantOne = false;
             }
-
+	
             // Got one
             return m_ipBuffer;
         }
@@ -445,7 +463,7 @@ namespace camera
                 // add the video input device
                 hr = m_FilterGraph.AddSourceFilterForMoniker(dev.Mon, null, dev.Name, out capFilter);
                 DsError.ThrowExceptionForHR(hr);
-
+           
                 m_CamControl = (IAMCameraControl)capFilter;
 
                 // Didn't find one.  Is there a preview pin?
@@ -477,7 +495,7 @@ namespace camera
                         // input pin for the splitter, and connnect them
                         pRaw = DsFindPin.ByCategory(capFilter, PinCategory.Capture, 0);
                         pSmart = DsFindPin.ByDirection(iSmartTee, PinDirection.Input, 0);
-
+                     
                         hr = m_FilterGraph.Connect(pRaw, pSmart);
                         DsError.ThrowExceptionForHR(hr);
 
@@ -535,7 +553,7 @@ namespace camera
                 IBaseFilter pRenderer = new VideoRenderer() as IBaseFilter;
                 hr = m_FilterGraph.AddFilter(pRenderer, "Renderer");
                 DsError.ThrowExceptionForHR(hr);
-
+                
                 pRenderIn = DsFindPin.ByDirection(pRenderer, PinDirection.Input, 0);
 
                 // Add the sample grabber to the graph
@@ -663,20 +681,20 @@ namespace camera
             // Get the media type from the SampleGrabber
             AMMediaType media = new AMMediaType();
 
-            hr = sampGrabber.GetConnectedMediaType(media);
-            DsError.ThrowExceptionForHR(hr);
+            hr = sampGrabber.GetConnectedMediaType( media );
+            DsError.ThrowExceptionForHR( hr );
 
-            if ((media.formatType != FormatType.VideoInfo) || (media.formatPtr == IntPtr.Zero))
+            if( (media.formatType != FormatType.VideoInfo) || (media.formatPtr == IntPtr.Zero) )
             {
-                throw new NotSupportedException("Unknown Grabber Media Format");
+                throw new NotSupportedException( "Unknown Grabber Media Format" );
             }
 
             // Grab the size info
-            VideoInfoHeader videoInfoHeader = (VideoInfoHeader)Marshal.PtrToStructure(media.formatPtr, typeof(VideoInfoHeader));
+            VideoInfoHeader videoInfoHeader = (VideoInfoHeader) Marshal.PtrToStructure( media.formatPtr, typeof(VideoInfoHeader) );
             m_videoWidth = videoInfoHeader.BmiHeader.Width;
             m_videoHeight = videoInfoHeader.BmiHeader.Height;
             m_stride = m_videoWidth * (videoInfoHeader.BmiHeader.BitCount / 8);
-
+            
             DsUtils.FreeAMMediaType(media);
             media = null;
         }
@@ -690,20 +708,20 @@ namespace camera
 
             // Set the parent
             hr = ivw.put_Owner(hControl.Handle);
-            DsError.ThrowExceptionForHR(hr);
+            DsError.ThrowExceptionForHR( hr );
 
             // Turn off captions, etc
             hr = ivw.put_WindowStyle(WindowStyle.Child | WindowStyle.ClipChildren | WindowStyle.ClipSiblings);
-            DsError.ThrowExceptionForHR(hr);
+            DsError.ThrowExceptionForHR( hr );
 
             // Yes, make it visible
-            hr = ivw.put_Visible(OABool.True);
-            DsError.ThrowExceptionForHR(hr);
+            hr = ivw.put_Visible( OABool.True );
+            DsError.ThrowExceptionForHR( hr );
 
             // Move to upper left corner
             Rectangle rc = hControl.ClientRectangle;
-            hr = ivw.SetWindowPosition(0, 0, rc.Right, rc.Bottom);
-            DsError.ThrowExceptionForHR(hr);
+            hr = ivw.SetWindowPosition( 0, 0, rc.Right, rc.Bottom );
+            DsError.ThrowExceptionForHR( hr );
 
 
         }
@@ -712,20 +730,20 @@ namespace camera
         {
             int hr;
             AMMediaType media = new AMMediaType();
-
+            
             // Set the media type to Video/RBG24
             media.majorType = MediaType.Video;
             media.subType = MediaSubType.RGB24;
             media.formatType = FormatType.VideoInfo;
-            hr = sampGrabber.SetMediaType(media);
-            DsError.ThrowExceptionForHR(hr);
+            hr = sampGrabber.SetMediaType( media );
+            DsError.ThrowExceptionForHR( hr );
 
             DsUtils.FreeAMMediaType(media);
             media = null;
 
             // Configure the samplegrabber
-            hr = sampGrabber.SetCallback(this, 1);
-            DsError.ThrowExceptionForHR(hr);
+            hr = sampGrabber.SetCallback( this, 1 );
+            DsError.ThrowExceptionForHR( hr );
         }
 
         public static Point GetMaxFrameSize(IPin pStill)
@@ -774,7 +792,7 @@ namespace camera
             VideoInfoHeader v;
 
             IAMStreamConfig videoStreamConfig = pStill as IAMStreamConfig;
-
+   
             // Get the existing format block
             hr = videoStreamConfig.GetFormat(out media);
             DsError.ThrowExceptionForHR(hr);
@@ -783,14 +801,14 @@ namespace camera
             {
                 // copy out the videoinfoheader
                 v = new VideoInfoHeader();
-                Marshal.PtrToStructure(media.formatPtr, v);
-
+                Marshal.PtrToStructure( media.formatPtr, v );
+                
                 // if overriding the width, set the width
                 if (iWidth > 0)
                 {
                     v.BmiHeader.Width = iWidth;
                 }
-
+                
                 // if overriding the Height, set the Height
                 if (iHeight > 0)
                 {
@@ -802,13 +820,13 @@ namespace camera
                 {
                     v.BmiHeader.BitCount = iBPP;
                 }
-
+                
                 // Copy the media structure back
-                Marshal.StructureToPtr(v, media.formatPtr, false);
+                Marshal.StructureToPtr( v, media.formatPtr, false );
 
                 // Set the new format
-                hr = videoStreamConfig.SetFormat(media);
-                DsError.ThrowExceptionForHR(hr);
+                hr = videoStreamConfig.SetFormat( media );
+                DsError.ThrowExceptionForHR( hr );
             }
             finally
             {
@@ -824,7 +842,7 @@ namespace camera
 
             try
             {
-                if (m_FilterGraph != null)
+                if( m_FilterGraph != null )
                 {
                     IMediaControl mediaCtrl = m_FilterGraph as IMediaControl;
 
@@ -857,14 +875,14 @@ namespace camera
         }
 
         /// <summary> sample callback, NOT USED. </summary>
-        int ISampleGrabberCB.SampleCB(double SampleTime, IMediaSample pSample)
+        int ISampleGrabberCB.SampleCB( double SampleTime, IMediaSample pSample )
         {
             Marshal.ReleaseComObject(pSample);
             return 0;
         }
 
         /// <summary> buffer callback, COULD BE FROM FOREIGN THREAD. </summary>
-        int ISampleGrabberCB.BufferCB(double SampleTime, IntPtr pBuffer, int BufferLen)
+        int ISampleGrabberCB.BufferCB( double SampleTime, IntPtr pBuffer, int BufferLen )
         {
             // Note that we depend on only being called once per call to Click.  Otherwise
             // a second call can overwrite the previous image.
@@ -873,7 +891,7 @@ namespace camera
             if (m_WantOne)
             {
                 Debug.Assert(m_ipBuffer != IntPtr.Zero, "Unitialized buffer");
-
+            
                 // Save the buffer
                 CopyMemory(m_ipBuffer, pBuffer, BufferLen);
 

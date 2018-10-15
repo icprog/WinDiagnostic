@@ -34,6 +34,7 @@
         <Setter Property="FontSize" Value="40" />
         <Setter Property="Grid.Row" Value="0" />
         <Setter Property="Grid.Column" Value="0" />
+        <Setter Property="Padding" Value="0,0,0,0" />
     </Style>
     
 </ResourceDictionary>

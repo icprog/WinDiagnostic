@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿
+using System;
 using System.Drawing;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
 
-namespace camera
+namespace HotTabFunction
 {
     enum CameraList : int
     {
@@ -21,7 +19,7 @@ namespace camera
         DAP7_2084_0405
     }
 
-    class FangtecCameraDLL
+    public class FangtecCameraDLL
     {
         private static int mode = (int)CameraList.Normal;
 
@@ -160,7 +158,7 @@ namespace camera
                 case (int)CameraList.AG3820A11_S1_3ND_V_1_1_RT:
                 case (int)CameraList.AG3820A11_S1_3ND_V_1_1_RT_RIGHT:
                 case (int)CameraList.AV3850A22_SB_4B0:
-                case (int)CameraList.AV5050A22_V_1_0:
+                case (int)CameraList.AV5050A22_V_1_0:  
                     return FangtecCamera5MDLL.ALC_UnInitialization();
                 default:
                     return true;
@@ -177,8 +175,8 @@ namespace camera
                 case (int)CameraList.AG3820A11_S1_3ND_V_1_1_RT:
                 case (int)CameraList.AG3820A11_S1_3ND_V_1_1_RT_RIGHT:
                 case (int)CameraList.AV3850A22_SB_4B0:
-                case (int)CameraList.AV5050A22_V_1_0:
-                    return FangtecCamera5MDLL.ALC_ProcReadFromISP(waddr, length, ref pValue);
+                case (int)CameraList.AV5050A22_V_1_0:  
+                    return FangtecCamera5MDLL.ALC_ProcReadFromISP(waddr, length, ref  pValue);
                 default:
                     return true;
             }
@@ -194,7 +192,7 @@ namespace camera
                 case (int)CameraList.AG3820A11_S1_3ND_V_1_1_RT:
                 case (int)CameraList.AG3820A11_S1_3ND_V_1_1_RT_RIGHT:
                 case (int)CameraList.AV3850A22_SB_4B0:
-                case (int)CameraList.AV5050A22_V_1_0:
+                case (int)CameraList.AV5050A22_V_1_0:  
                     return FangtecCamera5MDLL.ALC_ProcWriteToISP(waddr, length, ref pValue);
                 default:
                     return true;
@@ -233,7 +231,7 @@ namespace camera
                 case (int)CameraList.AG3820A11_S1_3ND_V_1_1_RT:
                 case (int)CameraList.AG3820A11_S1_3ND_V_1_1_RT_RIGHT:
                 case (int)CameraList.AV3850A22_SB_4B0:
-                case (int)CameraList.AV5050A22_V_1_0:
+                case (int)CameraList.AV5050A22_V_1_0:  
                     bRet = FangtecCamera5MDLL.ALC_GetFirmwareVersion(pRomVersion);
                     stpRomVersion = System.Text.ASCIIEncoding.ASCII.GetString(pRomVersion, 0, GetByteLen(pRomVersion));
                     return bRet;
@@ -296,7 +294,7 @@ namespace camera
             {
                 ucLedOn = 0x02;// gpio 1
             }
-            else if ((mode == (int)CameraList.AG3820A11_S1_3ND_V_1_1_RT) || (mode == (int)CameraList.AG3820A11_S1_3ND_V_1_1_RT_RIGHT) || (mode == (int)CameraList.AV3850A22_SB_4B0))
+            else if ((mode == (int)CameraList.AG3820A11_S1_3ND_V_1_1_RT) || (mode == (int)CameraList.AG3820A11_S1_3ND_V_1_1_RT_RIGHT)||(mode == (int)CameraList.AV3850A22_SB_4B0))
             {
                 ucLedOn = 0x40;// gpio 6
             }
@@ -318,7 +316,7 @@ namespace camera
 
             ALC_ProcWriteToISP(ucLedDirc, ucLen, ref ucData);
             // Led on
-            ALC_ProcReadFromISP(ucLedLoc, ucLen, ref ucData);
+            ALC_ProcReadFromISP(ucLedLoc, ucLen, ref  ucData);
 
             if (ucOnOff == 1)
             {
@@ -361,4 +359,5 @@ namespace camera
         #endregion
 
     }
+
 }

@@ -1,4 +1,5 @@
 ﻿using barcode;
+using HotTabFunction;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;

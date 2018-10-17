@@ -1,0 +1,64 @@
+﻿<Window x:Class="brightness.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:brightness"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="480" Width="640" WindowState="Maximized" WindowStyle="None">
+    
+    <Grid ShowGridLines="False">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <GroupBox FontWeight="Bold" Name="Brightness" Visibility="Visible" Header="Step 1: Check Brightness" Grid.Column="0" Grid.Row="2" FontSize="30" Grid.ColumnSpan="8" Grid.RowSpan="4" VerticalAlignment="Center" HorizontalAlignment="Stretch">
+            <GroupBox.Style>
+                <Style TargetType="GroupBox">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Down}" Value="True">
+                            <Setter Property="Visibility" Value="Hidden" />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </GroupBox.Style>
+            <Grid VerticalAlignment="Center">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Label FontSize="24" FontWeight="Normal" Content="Min" HorizontalAlignment="Left"/>
+                <Label FontSize="24" FontWeight="Normal" Content="Max" HorizontalAlignment="Right"/>
+                <StackPanel Orientation="Vertical" VerticalAlignment="Stretch" Grid.Row="1" Grid.RowSpan="4">
+                    <Slider ValueChanged="slValue_ValueChanged" Name="slValue" Minimum="0" Maximum="10" TickFrequency="1" TickPlacement="BottomRight" Value="5"/>
+                    <Label  Content="{Binding ElementName=slValue, Path=Value, UpdateSourceTrigger=PropertyChanged}" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+        </GroupBox>
+
+        <Label Style="{StaticResource TestItem}" Content="Brightness"/>
+        <Button Style="{DynamicResource Fail}" Click="FAIL_Click"/>
+        
+    </Grid>
+</Window>

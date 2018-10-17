@@ -203,6 +203,7 @@ namespace HotTabFunction
         public static bool bIsReadingEC = false;
         public static bool bIsBrightnessReadingEC = false;
         public static bool IsDebugMode = true;
+        public static string TestProduct = "IB80";
 
         #endregion
 
@@ -512,7 +513,7 @@ namespace HotTabFunction
             //    if (HotTabDLL.IsDebugMode) Trace.WriteLine("Old Hottab Version, Hottab Mode(0).");
             //    bResult = ModeOpen(0); // Hottab Mode(Old Hottab : Only Hottab Mode)
             // }
-            if (HotTabDLL.TestProduct.Equals("FMB8"))
+            if (TestProduct.Equals("FMB8"))
             {
                 if (HotTabDLL.IsDebugMode) Trace.WriteLine("Keyboard Mode - Standard Mode(1).");
                 bResult = ModeOpen(1); // Standard Mode
@@ -959,6 +960,10 @@ namespace HotTabFunction
 
         #endregion
 
+        public static void SetTestProduct(string Product)
+        {
+            TestProduct = Product;
+        }
 
         public static bool CheckComExist(string stCOM)
         {

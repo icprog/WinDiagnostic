@@ -1,0 +1,9 @@
+{
+  "name": "brightness_m101b",
+  "IsAutoModeBrightness": true,
+  "TestProduct": "IB80",
+  "TimerIntervalBrightness": 250,
+  "BrightnessMaximum": 10,
+  "BrightnessMinimum": 0,
+  "IsSensorHubExist": true
+}

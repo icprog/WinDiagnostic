@@ -1,4 +1,5 @@
 {
   "name": "touch_m101b",
-  "power pin": 23
+  "TotalFailCount": 3,
+  "UseGalaxSensorTester": false
 }

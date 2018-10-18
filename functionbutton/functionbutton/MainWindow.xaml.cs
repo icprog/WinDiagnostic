@@ -233,7 +233,7 @@ namespace functionbutton
             }
         }
 
-        public static void checkTestStatus(String testResult)
+        public static void checkTestStatus(string testResult)
         {
             Task.Factory.StartNew(() =>
             {

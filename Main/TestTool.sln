@@ -37,6 +37,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "brightness", "..\brightness
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HotTabFunction", "..\HotTabFunction\HotTabFunction.csproj", "{A68E1CDB-6AFE-47E3-B36E-5CD76486322A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "touch", "..\touch\touch\touch.csproj", "{011A2BA0-73F7-425B-9D51-82F372C4B046}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -111,6 +113,10 @@ Global
 		{A68E1CDB-6AFE-47E3-B36E-5CD76486322A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A68E1CDB-6AFE-47E3-B36E-5CD76486322A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A68E1CDB-6AFE-47E3-B36E-5CD76486322A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{011A2BA0-73F7-425B-9D51-82F372C4B046}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{011A2BA0-73F7-425B-9D51-82F372C4B046}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{011A2BA0-73F7-425B-9D51-82F372C4B046}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{011A2BA0-73F7-425B-9D51-82F372C4B046}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

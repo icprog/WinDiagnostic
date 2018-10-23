@@ -1,0 +1,14 @@
+{
+  "name": "battery_m101b",
+  "PortAddressRTS": "COM11",
+  "TestProduct": "IB80",
+  "IsBiosTestModeEnabled": false,
+  "IsBTZ1": false,
+  "IsFixtureExisted": true,
+  "IsVerifyBatteryFirmware": true,
+  "NoGaugeIC": false,
+  "BatteryTotalCount": 5,
+  "CorrectTolerance": 0.8,
+  "BatteryAmount": 2,
+  "SBATChangeThreshold": 0.84
+}

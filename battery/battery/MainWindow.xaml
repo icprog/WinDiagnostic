@@ -1,0 +1,111 @@
+﻿<Window x:Class="battery.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:battery"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="480" Width="640" WindowState="Maximized" WindowStyle="None">
+    <Grid ShowGridLines="False">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Label Name="Title" Style="{StaticResource TestItem}" Content="Battery" VerticalAlignment="Center" Margin="0" Padding="0" FontSize="36"/>
+        <Label Content="Real-time monitoring :" Grid.Column="6" FontSize="28" FontWeight="Bold" Margin="0" Padding="0" Grid.ColumnSpan="6" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+        <Label Name="TestCount" Content="Total     :" Foreground="Blue" FontSize="28" FontWeight="Bold" Margin="0" Padding="0" Grid.ColumnSpan="3" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Row="1"/>
+        <Label Name="ReadCorrectCount" Content="Correct :" Foreground="Blue" FontSize="28" FontWeight="Bold" Margin="0" Padding="0" Grid.ColumnSpan="3" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Row="2"/>
+        <Label Content="MBAT :" Foreground="Blue" FontSize="28" FontWeight="Bold" Margin="0" Padding="0" Grid.ColumnSpan="3" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Row="1" Grid.Column="6"/>
+        <Label Content="SBAT :" Foreground="Blue" FontSize="28" FontWeight="Bold" Margin="0" Padding="0" Grid.ColumnSpan="3" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Row="2" Grid.Column="6"/>
+        <Label Name="B1RealTimeInfo" Content="No data" FontSize="28" FontWeight="Bold" Margin="0" Padding="0" Grid.ColumnSpan="3" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Row="1" Grid.Column="9"/>
+        <Label Name="B2RealTimeInfo" Content="No data" FontSize="28" FontWeight="Bold" Margin="0" Padding="0" Grid.ColumnSpan="3" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Row="2" Grid.Column="9"/>
+        <Label Content="AC Status" FontSize="28" Margin="0" Padding="0" Grid.ColumnSpan="3" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Row="3"/>
+        <TextBox Name="AC_Status" Text="" FontSize="24" FontWeight="Bold" Padding="0" Margin="0" Grid.Row="3" Grid.Column="3" VerticalAlignment="Center" Grid.ColumnSpan="3" HorizontalAlignment="Center"/>
+        <GroupBox Name="groupMainBattery" Grid.ColumnSpan="6" Header="Main Battery" Margin="0" Grid.RowSpan="6" Grid.Row="4" FontSize="26" FontWeight="Bold" HorizontalContentAlignment="Stretch">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1.2*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Label  Content="Percentage" FontSize="24" FontWeight="Bold" HorizontalAlignment="Left" Padding="0" Margin="0"/>
+                <Label Content="Current" FontSize="24" FontWeight="Bold" HorizontalAlignment="Left" Padding="0" Margin="0" Grid.Row="1"/>
+                <Label Content="Voltage" FontSize="24" FontWeight="Bold" HorizontalAlignment="Left" Padding="0" Margin="0" Grid.Row="2"/>
+                <Label Content="Remaining CY" FontSize="24" FontWeight="Bold" HorizontalAlignment="Left" Padding="0" Margin="0" Grid.Row="3"/>
+                <Label Content="Full CY" FontSize="24" FontWeight="Bold" HorizontalAlignment="Left" Padding="0" Margin="0" Grid.Row="4"/>
+                <Label Content="Firmware" FontSize="24" FontWeight="Bold" HorizontalAlignment="Left" Padding="0" Margin="0" Grid.Row="6"/>
+
+                <TextBox Name="labelBat1Percentage" Text="" FontSize="24" FontWeight="Bold" Padding="0" Margin="0" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+                <TextBox Name="labelBat1NowCurrent" Text="" FontSize="24" FontWeight="Bold" Padding="0" Margin="0" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+                <TextBox Name="labelBat1Voltage" Text="" FontSize="24" FontWeight="Bold" Padding="0" Margin="0" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+                <TextBox Name="labelBat1Remaining" Text="" FontSize="24" FontWeight="Bold" Padding="0" Margin="0" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+                <TextBox Name="labelBat1FullCapacity" Text="" FontSize="24" FontWeight="Bold" Padding="0" Margin="0" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+                <TextBox Name="labelBat1Firmware" Text="" FontSize="24" FontWeight="Bold" Padding="0" Margin="0" Grid.Row="6" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+            </Grid>
+        </GroupBox>
+
+        <GroupBox Name="groupSecondBattery" Grid.ColumnSpan="6" Header="Second Battery" Margin="0" Grid.RowSpan="6" Grid.Row="4" FontSize="26" FontWeight="Bold" HorizontalContentAlignment="Stretch" Grid.Column="6">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1.2*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Label Content="Percentage" FontSize="24" FontWeight="Bold" HorizontalAlignment="Left" Padding="0" Margin="0"/>
+                <Label Content="Current" FontSize="24" FontWeight="Bold" HorizontalAlignment="Left" Padding="0" Margin="0" Grid.Row="1"/>
+                <Label Content="Voltage" FontSize="24" FontWeight="Bold" HorizontalAlignment="Left" Padding="0" Margin="0" Grid.Row="2"/>
+                <Label Content="Remaining CY" FontSize="24" FontWeight="Bold" HorizontalAlignment="Left" Padding="0" Margin="0" Grid.Row="3"/>
+                <Label Content="Full CY" FontSize="24" FontWeight="Bold" HorizontalAlignment="Left" Padding="0" Margin="0" Grid.Row="4"/>
+                <Label Content="Firmware" FontSize="24" FontWeight="Bold" HorizontalAlignment="Left" Padding="0" Margin="0" Grid.Row="6"/>
+
+                <TextBox Name="labelBat2Percentage" Text="" FontSize="24" FontWeight="Bold" Padding="0" Margin="0" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+                <TextBox Name="labelBat2NowCurrent" Text="" FontSize="24" FontWeight="Bold" Padding="0" Margin="0" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+                <TextBox Name="labelBat2Voltage" Text="" FontSize="24" FontWeight="Bold" Padding="0" Margin="0" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+                <TextBox Name="labelBat2Remaining" Text="" FontSize="24" FontWeight="Bold" Padding="0" Margin="0" Grid.Row="3" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+                <TextBox Name="labelBat2FullCapacity" Text="" FontSize="24" FontWeight="Bold" Padding="0" Margin="0" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+                <TextBox Name="labelBat2Firmware" Text="" FontSize="24" FontWeight="Bold" Padding="0" Margin="0" Grid.Row="6" Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+            </Grid>
+        </GroupBox>
+        <Label Content="Battery Life" FontSize="28" Margin="0,4.8" Padding="0" Grid.ColumnSpan="3" HorizontalAlignment="Left" VerticalAlignment="Center" Grid.Row="3" Grid.Column="6"/>
+        <TextBox Name="BatteryLife" Text="" FontSize="24" FontWeight="Bold" Padding="0" Margin="0" Grid.Row="3" Grid.Column="9" VerticalAlignment="Center" Grid.ColumnSpan="5" HorizontalAlignment="Center"/>
+
+    </Grid>
+</Window>

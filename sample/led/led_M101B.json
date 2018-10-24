@@ -1,0 +1,11 @@
+{
+  "name": "led_m101b",
+  "TestProduct": "IB80",
+  "IsBiosTestModeEnabled": false,
+  "IsAutoModeBatteryLED": false,
+  "IsFixtureExisted": true,
+  "EnablePower": true,
+  "EnableHDD": true,
+  "EnableRF": true,
+  "EnableBattery": 1,
+}

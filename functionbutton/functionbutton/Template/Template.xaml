@@ -17,6 +17,38 @@
         <Setter Property="Width" Value="150" />
     </Style>
 
+    <Style x:Key="Pass" TargetType="Button">
+        <Setter Property="Content" Value="PASS" />
+        <Setter Property="Grid.ColumnSpan" Value="4" />
+        <Setter Property="Grid.RowSpan" Value="1" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Foreground" Value="Green" />
+        <Setter Property="Background" Value="LightGray" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="FontSize" Value="38" />
+        <Setter Property="Grid.Row" Value="1" />
+        <Setter Property="Grid.Column" Value="3" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Width" Value="150" />
+    </Style>
+
+    <Style x:Key="Test" TargetType="Button">
+        <Setter Property="Content" Value="TEST" />
+        <Setter Property="Grid.ColumnSpan" Value="4" />
+        <Setter Property="Grid.RowSpan" Value="1" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Foreground" Value="Blue" />
+        <Setter Property="Background" Value="LightGray" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="FontSize" Value="38" />
+        <Setter Property="Grid.Row" Value="1" />
+        <Setter Property="Grid.Column" Value="3" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Width" Value="150" />
+    </Style>
+
     <Style x:Key="NButton" TargetType="Button">
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="Background" Value="LightGray" />

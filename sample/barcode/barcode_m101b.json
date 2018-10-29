@@ -1,0 +1,11 @@
+{
+  "name": "barcode_m101b",
+  "TestProduct": "IB80",
+  "BarcodeType": 2,
+  "BarcodeReadTime": 2000,
+  "PortAddressBarcode": "COM15",
+  "ConfirmTagContextBarcode": "071589812308",
+  "IsConfirmTagContextBarcode": true,
+  "IsHardwareTrigger": false,
+  "ShowWindow": false
+}

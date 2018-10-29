@@ -393,6 +393,9 @@ namespace led
             {
                 if (IsDebugMode) Trace.WriteLine("RF LED FAIL");
             }
+
+            HotTabDLL.WinIO_SetDeviceState(0xB7);
+            if (IsDebugMode) Trace.WriteLine("LED - SetDeviceState(0xB7)");
             checkTestStatus("CheckIt");
         }
 
@@ -440,8 +443,8 @@ namespace led
             {
                 buttonRFLEDTest.Foreground = Brushes.Red;
                 buttonRFLEDTest.Content = "OFF";
-                HotTabDLL.WinIO_SetDeviceState(0xA0);
-                if (IsDebugMode) Trace.WriteLine("LED - SetDeviceState(0xA0)");
+                HotTabDLL.WinIO_SetDeviceState(0x37);
+                if (IsDebugMode) Trace.WriteLine("LED - SetDeviceState(0x37)");
             }
         }
 

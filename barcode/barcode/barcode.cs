@@ -66,8 +66,28 @@ namespace barcode
             return Path.Combine(exepath, path);
         }
 
+        void CloseWidget()
+        {
+            foreach (Process clsProcess in Process.GetProcesses())
+            {
+                // 啟動測試程式前要先關閉 Hottab 跟 衍生 Widget
+                if (clsProcess.ProcessName.Contains("HotTab") || clsProcess.ProcessName.Contains("Hottab") ||
+                clsProcess.ProcessName.Contains("ScannerManager") || clsProcess.ProcessName.Contains("RF521Scan") ||
+                clsProcess.ProcessName.Contains("EA30Scan") || clsProcess.ProcessName.Contains("UHF_RFID") ||
+                clsProcess.ProcessName.Contains("SE4500DLScan") || clsProcess.ProcessName.Contains("Ignition_Control") ||
+                clsProcess.ProcessName.Contains("WMCamera") || clsProcess.ProcessName.Contains("WinSet") ||
+                clsProcess.ProcessName.Contains("WMControlCenter") || clsProcess.ProcessName.Contains("BatteryInfo")
+                )
+                {
+                    if (IsDebugMode) Trace.WriteLine("Kill 3rd-party process : " + clsProcess.ProcessName.ToString());
+                    clsProcess.Kill();
+                }
+            }
+        }
+
         private void Barcode_Load(object sender, EventArgs e)
         {
+            CloseWidget();
             result["result"] = "FAIL";
             var jsonconfig = GetFullPath("config.json");
             if (!File.Exists(jsonconfig))

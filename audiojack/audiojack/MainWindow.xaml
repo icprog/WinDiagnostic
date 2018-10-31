@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:audiojack"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" WindowState="Maximized" WindowStyle="None">
+        Title="MainWindow" Height="450" Width="800" WindowState="Maximized" WindowStyle="None" Topmost="True">
     
     <Grid ShowGridLines="False">
         <Grid.ColumnDefinitions>

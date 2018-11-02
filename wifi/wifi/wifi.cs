@@ -550,6 +550,11 @@ namespace wifi
                 labelResult.Text = "PASS";
                 labelResult.ForeColor = Color.Green;
                 result["result"] = "PASS";
+                result["EIPLog"] = new JObject
+                {
+                    { "WiFi", "PASS" },
+                    { "WiFi_Info", "PASS"}
+                };
             }
             else
             {
@@ -557,6 +562,11 @@ namespace wifi
                 else labelResult.Text = "FAIL";
                 labelResult.ForeColor = Color.Red;
                 result["result"] = "FAIL";
+                result["EIPLog"] = new JObject
+                {
+                    { "WiFi", "FAIL" },
+                    { "WiFi_Info", testResult}
+                };
                 //if (PingStatusSuccess <= 0)
             }
 

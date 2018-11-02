@@ -244,12 +244,22 @@ namespace rotation
                 labelResult.Text = "PASS";
                 labelResult.ForeColor = Color.Green;
                 result["result"] = "PASS";
+                result["EIPLog"] = new JObject
+                {
+                    { "Rotation", "PASS" },
+                    { "Rotation_Info", "PASS"}
+                };
             }
             else
             {
                 labelResult.Text = "FAIL";
                 labelResult.ForeColor = Color.Red;
                 result["result"] = "FAIL";
+                result["EIPLog"] = new JObject
+                {
+                    { "Rotation", "FAIL" },
+                    { "Rotation_Info", testResult}
+                };
             }
 
             File.WriteAllText(GetFullPath("result.json"), result.ToString());
@@ -291,7 +301,7 @@ namespace rotation
                 }
                 else if (AccelerometerDetectCount > ThresholdTimeoutAutoMode)
                 {
-                    checkTestStatus("User canceled the test.");
+                    checkTestStatus(string.Format("AccelerometerDetectCount: {0} > ThresholdTimeoutAutoMode: {1}", AccelerometerDetectCount, ThresholdTimeoutAutoMode));
                 }
             }
 

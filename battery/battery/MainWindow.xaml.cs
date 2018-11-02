@@ -1067,11 +1067,21 @@ namespace battery
             {
                 Trace.WriteLine("PASS");
                 result["result"] = "PASS";
+                result["EIPLog"] = new JObject
+                {
+                    { "Battery", "PASS" },
+                    { "Battery_Info", "PASS"}
+                };
             }
             else
             {
                 Trace.WriteLine("FAIL");
                 result["result"] = "FAIL";
+                result["EIPLog"] = new JObject
+                {
+                    { "Battery", "FAIL" },
+                    { "Battery_Info", testResult}
+                };
             }
 
             // 完成Battery測試, 將計數器重新歸零

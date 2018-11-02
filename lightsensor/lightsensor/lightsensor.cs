@@ -524,12 +524,22 @@ namespace lightsensor
                 labelResult.ForeColor = Color.Green;
                 labelResult.Text = "PASS";
                 result["result"] = "PASS";
+                result["EIPLog"] = new JObject
+                {
+                    { "LightSensor", "PASS" },
+                    { "LightSensor_Info", "PASS"}
+                };
             }
             else
             {
                 labelResult.ForeColor = Color.Red;
                 labelResult.Text = "FAIL";
                 result["result"] = "FAIL";
+                result["EIPLog"] = new JObject
+                {
+                    { "LightSensor", "FAIL" },
+                    { "LightSensor_Info", testResult}
+                };
             }
 
             buttonPASS.Enabled = false;

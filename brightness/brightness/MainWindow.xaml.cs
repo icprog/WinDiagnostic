@@ -204,10 +204,20 @@ namespace brightness
             if (testResult.Equals("PASS"))
             {
                 result["result"] = "PASS";
+                result["EIPLog"] = new JObject
+                {
+                    { "Brightness", "PASS" },
+                    { "Brightness_Info", "PASS"}
+                };
             }
             else
             {
                 result["result"] = "FAIL";
+                result["EIPLog"] = new JObject
+                {
+                    { "Brightness", "FAIL" },
+                    { "Brightness_Info", testResult}
+                };
             }
 
             File.WriteAllText(GetFullPath("result.json"), result.ToString());

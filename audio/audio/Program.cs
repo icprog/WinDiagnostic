@@ -2,6 +2,7 @@
 using SpeakerMicAutoTestApi;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -73,27 +74,36 @@ namespace audio
 
                 switch (testresult)
                 {
-                    case Result.FanRecordFail:
-                        Console.WriteLine("FanRecordFail");
-                        break;
-                    case Result.InternalLeftMicFail:
-                        Console.WriteLine("InternalLeftMicFail");
-                        break;
-                    case Result.InternalRightMicFail:
-                        Console.WriteLine("InternalRightMicFail");
-                        break;
-                    case Result.LeftSpeakerFail:
-                        Console.WriteLine("LeftSpeakerFail");
-                        break;
-                    case Result.RightSpeakerFail:
-                        Console.WriteLine("RightSpeakerFail");
-                        break;
                     case Result.Pass:
                         Console.WriteLine("Pass");
                         result["result"] = "PASS";
+                        result["EIPLog"] = new JObject
+                        {
+                            { "Audio", "PASS" },
+                            { "Audio_Info", string.Format("LeftIntensity:{0} RightIntensity:{1} ExternalRecordThreshold:{2} InternalIntensity:{3} InternalRecordThreshold:{4}",api.LeftIntensity,api.RightIntensity,api.ExternalRecordThreshold,api.InternalIntensity,api.InternalRecordThreshold)}
+                        };
                         break;
                     case Result.ExceptionFail:
-                        Console.WriteLine("ExceptionFail");
+                        Console.WriteLine("Exception");
+                        result["result"] = "FAIL";
+                        result["EIPLog"] = new JObject
+                        {
+                            { "Audio", "FAIL" },
+                            { "Audio_Info", api?.Exception.InnerException.Message}
+                        };
+                        break;
+                    case Result.FanRecordFail:
+                    case Result.InternalLeftMicFail:
+                    case Result.InternalRightMicFail:
+                    case Result.LeftSpeakerFail:
+                    case Result.RightSpeakerFail:
+                        Console.WriteLine("FAIL");
+                        result["result"] = "FAIL";
+                        result["EIPLog"] = new JObject
+                        {
+                            { "Audio", "FAIL" },
+                            { "Audio_Info", string.Format("LeftIntensity:{0} RightIntensity:{1} ExternalRecordThreshold:{2} InternalIntensity:{3} InternalRecordThreshold:{4}",api.LeftIntensity,api.RightIntensity,api.ExternalRecordThreshold,api.InternalIntensity,api.InternalRecordThreshold)}
+                        };
                         break;
                 }                
             }

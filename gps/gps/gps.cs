@@ -148,7 +148,7 @@ namespace gps
                 }
                 else
                 {
-                    HotTabDLL.WinIO_SetDevice2State(Device2AllPowerOnOthers); // IB80 Bit6(Battery_Max_Charge) 只會讓電池充到50%
+                    HotTabDLL.WinIO_SetDevice2State(0x3E); // IB80 Bit6(Battery_Max_Charge) 只會讓電池充到50%
                 }
                 // IBxx & IHxx 系列需開啟Bit5(ExpUSBEn)電源, 才有辦法測試背後接點
             }
@@ -469,6 +469,11 @@ namespace gps
                 labelResult.ForeColor = Color.Green;
                 labelResult.Text = "Pass";
                 result["result"] = "PASS";
+                result["EIPLog"] = new JObject
+                {
+                    { "GPS", "PASS" },
+                    { "GPS_Info", "PASS"}
+                };
             }
             else
             {
@@ -476,6 +481,11 @@ namespace gps
                 labelResult.ForeColor = Color.Red;
                 labelResult.Text = "Fail";
                 result["result"] = "FAIL";
+                result["EIPLog"] = new JObject
+                {
+                    { "GPS", "FAIL" },
+                    { "GPS_Info", testResult}
+                };
             }
 
             File.WriteAllText(GetFullPath("result.json"), result.ToString());

@@ -320,11 +320,21 @@ namespace comport
                 labelResult.Text = "PASS";
                 labelResult.ForeColor = Color.Green;
                 result["result"] = "PASS";
+                result["EIPLog"] = new JObject
+                {
+                    { "Comport", "PASS" },
+                    { "Comport_Info", "PASS"}
+                };
             }
             else
             {
                 labelResult.Text = "FAIL";
                 labelResult.ForeColor = Color.Red;
+                result["EIPLog"] = new JObject
+                {
+                    { "Comport", "FAIL" },
+                    { "Comport_Info", testResult}
+                };
             }
         }
 

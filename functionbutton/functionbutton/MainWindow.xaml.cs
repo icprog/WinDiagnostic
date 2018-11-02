@@ -202,6 +202,7 @@ namespace functionbutton
                 ButtonNumber = 5;
 
             Trace.WriteLine("FunctionButton_Load");
+            HotTabDLL.WinIO_SetDevice2State(0x3E);  //close barcode power
             Trace.WriteLine("Init KeyboardHook");
             mKeyboardHook = new KeyboardHook((int)GetHandle(this), true);
             WinIO_FunctionButtonLock();
@@ -242,10 +243,20 @@ namespace functionbutton
                 {
                    
                     result["result"] = "PASS";
+                    result["EIPLog"] = new JObject
+                    {
+                        { "FunctionButton", "PASS" },
+                        { "FunctionButton_Info", "PASS"}
+                    };
                 }
                 else
                 {
                     result["result"] = "FAIL";
+                    result["EIPLog"] = new JObject
+                    {
+                        { "FunctionButton", "PASS" },
+                        { "FunctionButton_Info", testResult}
+                    };
                 }
 
                 File.WriteAllText(GetFullPath("result.json"), result.ToString());

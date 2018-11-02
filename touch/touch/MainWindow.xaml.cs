@@ -79,10 +79,20 @@ namespace touch
             if (testResult.Equals("PASS"))
             {
                 result["result"] = "PASS";
+                result["EIPLog"] = new JObject
+                {
+                    { "Touch", "PASS" },
+                    { "Touch_Info", "PASS"}
+                };
             }
             else
             {
                 result["result"] = "FAIL";
+                result["EIPLog"] = new JObject
+                {
+                    { "Touch", "FAIL" },
+                    { "Touch_Info", testResult}
+                };
             }
 
             File.WriteAllText(GetFullPath("result.json"), result.ToString());
@@ -95,7 +105,7 @@ namespace touch
         {
             FailCount++;
             if (FailCount >= TotalFailCount)
-                checkTestStatus("FAIL");            
+                checkTestStatus("out of bound three times");            
         }
     }
 }

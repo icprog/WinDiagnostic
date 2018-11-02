@@ -402,12 +402,22 @@ namespace barcode
                 labelResult.ForeColor = Color.Green;
                 labelResult.Text = "PASS";
                 result["result"] = "PASS";
+                result["EIPLog"] = new JObject
+                {
+                    { "Barcode", "PASS" },
+                    { "Barcode_Info", "PASS"}
+                };
             }
             else
             {
                 labelResult.ForeColor = Color.Red;
                 labelResult.Text = "FAIL";
                 result["result"] = "FAIL";
+                result["EIPLog"] = new JObject
+                {
+                    { "Barcode", "FAIL" },
+                    { "Barcode_Info", testResult}
+                };
             }
 
             File.WriteAllText(GetFullPath("result.json"), result.ToString());

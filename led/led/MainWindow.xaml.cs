@@ -227,6 +227,11 @@ namespace led
             {
                 Trace.WriteLine("PASS");
                 result["result"] = "PASS";
+                result["EIPLog"] = new JObject
+                {
+                    { "LED", "PASS" },
+                    { "LED_Info", "PASS"}
+                };
                 File.WriteAllText(GetFullPath("result.json"), result.ToString());
                 Thread.Sleep(200);
                 File.Create(GetFullPath("completed"));
@@ -236,6 +241,11 @@ namespace led
             {
                 Trace.WriteLine("FAIL");
                 result["result"] = "FAIL";
+                result["EIPLog"] = new JObject
+                {
+                    { "LED", "FAIL" },
+                    { "LED_Info", "LED FAIL"}
+                };
                 File.WriteAllText(GetFullPath("result.json"), result.ToString());
                 Thread.Sleep(200);
                 File.Create(GetFullPath("completed"));

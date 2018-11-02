@@ -901,10 +901,20 @@ namespace bluetooth
             if (testResult.Equals("PASS"))
             {
                 result["result"] = "PASS";
+                result["EIPLog"] = new JObject
+                {
+                    { "Bluetooth", "PASS" },
+                    { "Bluetooth_Info", "PASS"}
+                };
             }
             else
             {
                 result["result"] = "FAIL";
+                result["EIPLog"] = new JObject
+                {
+                    { "Bluetooth", "FAIL" },
+                    { "Bluetooth_Info", testResult}
+                };
             }
 
         }

@@ -590,12 +590,22 @@ namespace camera
                 labelResult.ForeColor = Color.Green;
                 labelResult.Text = "PASS";
                 result["result"] = "PASS";
+                result["EIPLog"] = new JObject
+                {
+                    { "Camera", "PASS" },
+                    { "Camera_Info", "PASS"}
+                };
             }
             else
             {
                 labelResult.ForeColor = Color.Red;
                 labelResult.Text = "FAIL";
                 result["result"] = "FAIL";
+                result["EIPLog"] = new JObject
+                {
+                    { "Camera", "FAIL" },
+                    { "Camera_Info", testResult}
+                };
             }
 
             File.WriteAllText(GetFullPath("result.json"), result.ToString());

@@ -623,6 +623,11 @@ namespace lan
                 //PublicFunction.AddTestNameToCurrentAlarmReport(true, "LAN");// 儲存自動測項中PASS的測項名稱
                 GotoNextTestItem("PASS");
                 result["result"] = "PASS";
+                result["EIPLog"] = new JObject
+                {
+                    { "LAN", "PASS" },
+                    { "LAN_Info", "PASS"}
+                };
             }
             else
             {
@@ -638,7 +643,12 @@ namespace lan
                 //// 自動測項此時測試失敗, 讓SerialNumber頁面背景閃紅色
                 //PublicFunction.AddTestNameToCurrentAlarmReport(false, "LAN");// 儲存自動測項中FAIL的測項名稱
                 GotoNextTestItem("FAIL");
-                result["result"] = "FAIL";                
+                result["result"] = "FAIL";
+                result["EIPLog"] = new JObject
+                {
+                    { "LAN", "FAIL" },
+                    { "LAN_Info", testResult}
+                };
             }
             lock (objlock)
             {

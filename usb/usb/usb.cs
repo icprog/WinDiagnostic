@@ -388,6 +388,11 @@ namespace usb
                 labelResult.Text = "PASS";
                 labelResult.ForeColor = Color.Green;
                 result["result"] = "PASS";
+                result["EIPLog"] = new JObject
+                {
+                    { "USB", "PASS" },
+                    { "USB_Info", "PASS"}
+                };
                 Trace.WriteLine(testResult);
             }
             else
@@ -402,6 +407,11 @@ namespace usb
                 labelResult.Text = "FAIL";
                 labelResult.ForeColor = Color.Red;
                 result["result"] = "FAIL";
+                result["EIPLog"] = new JObject
+                {
+                    { "USB", "FAIL" },
+                    { "USB_Info", testResult}
+                };
                 Trace.WriteLine(testResult);
             }
         }

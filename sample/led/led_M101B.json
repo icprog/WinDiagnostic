@@ -7,5 +7,5 @@
   "EnablePower": true,
   "EnableHDD": true,
   "EnableRF": true,
-  "EnableBattery": 1,
+  "EnableBattery": 1
 }

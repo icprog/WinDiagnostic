@@ -211,13 +211,21 @@ namespace audiojack
 
             if (testResult.Equals("PASS"))
             {
-                Console.WriteLine("PASS");
                 result["result"] = "PASS";
+                result["EIPLog"] = new JObject
+                {
+                    { "AudioJack", "PASS" },
+                    { "AudioJack_Info", string.Format("AudioJackIntensity:{0} AudioJackRecordThreshold:{1}",AutoModeAudioTest?.AudioJackIntensity,AutoModeAudioTest?.AudioJackRecordThreshold)}
+                };
             }
             else
             {
                 result["result"] = "FAIL";
-                Console.WriteLine("FAIL");
+                result["EIPLog"] = new JObject
+                {
+                    { "AudioJack", "FAIL" },
+                    { "AudioJack_Info", string.Format("{2}, AudioJackIntensity:{0} AudioJackRecordThreshold:{1}",AutoModeAudioTest?.AudioJackIntensity,AutoModeAudioTest?.AudioJackRecordThreshold,testResult)}
+                };
                 Left.IsEnabled = true;
                 Right.IsEnabled = false;
             }

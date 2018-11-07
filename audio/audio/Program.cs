@@ -80,7 +80,7 @@ namespace audio
                         result["EIPLog"] = new JObject
                         {
                             { "Audio", "PASS" },
-                            { "Audio_Info", string.Format("LeftIntensity:{0} RightIntensity:{1} ExternalRecordThreshold:{2} InternalIntensity:{3} InternalRecordThreshold:{4}",api.LeftIntensity,api.RightIntensity,api.ExternalRecordThreshold,api.InternalIntensity,api.InternalRecordThreshold)}
+                            { "Audio_Info", string.Format("Left={0} Right={1} Threshold={2} Top={3} Threshold={4}",(int)api.LeftIntensity,(int)api.RightIntensity,(int)api.ExternalRecordThreshold,(int)api.InternalIntensity,(int)api.InternalRecordThreshold)}
                         };
                         break;
                     case Result.ExceptionFail:
@@ -93,6 +93,7 @@ namespace audio
                         };
                         break;
                     case Result.FanRecordFail:
+                    case Result.InternalMicFail:
                     case Result.InternalLeftMicFail:
                     case Result.InternalRightMicFail:
                     case Result.LeftSpeakerFail:
@@ -102,7 +103,16 @@ namespace audio
                         result["EIPLog"] = new JObject
                         {
                             { "Audio", "FAIL" },
-                            { "Audio_Info", string.Format("LeftIntensity:{0} RightIntensity:{1} ExternalRecordThreshold:{2} InternalIntensity:{3} InternalRecordThreshold:{4}",api.LeftIntensity,api.RightIntensity,api.ExternalRecordThreshold,api.InternalIntensity,api.InternalRecordThreshold)}
+                            { "Audio_Info", string.Format("Left={0} Right={1} Threshold={2} Top={3} Threshold={4}",(int)api.LeftIntensity,(int)api.RightIntensity,(int)api.ExternalRecordThreshold,(int)api.InternalIntensity,(int)api.InternalRecordThreshold)}
+                        };
+                        break;
+                    default:
+                        Console.WriteLine("default");
+                        result["result"] = "FAIL";
+                        result["EIPLog"] = new JObject
+                        {
+                            { "Audio", "FAIL" },
+                            { "Audio_Info", string.Format("Left={0} Right={1} Threshold={2} Top={3} Threshold={4}",(int)api.LeftIntensity,(int)api.RightIntensity,(int)api.ExternalRecordThreshold,(int)api.InternalIntensity,(int)api.InternalRecordThreshold)}
                         };
                         break;
                 }                

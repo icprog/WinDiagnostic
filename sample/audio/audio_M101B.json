@@ -1,8 +1,8 @@
 {
   "name": "audio_m101b",
   "TestProduct": "IB80",
-  "ExternalRecordThreshold": 2000,
-  "InternalRecordThreshold": 3000,
+  "ExternalRecordThreshold": 15000,
+  "InternalRecordThreshold": 15000,
   "AudioJackRecordThreshold": 20000,
   "MachineAudioDevice": ["d5a47fa8-6d98-11d1-a21a-00a0c9223196"],
   "ExternalAudioDevice": ["4e1cf13f-1679-463b-a72f-a5bf64c86eba"],

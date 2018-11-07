@@ -10,5 +10,9 @@
   "BatteryTotalCount": 5,
   "CorrectTolerance": 0.8,
   "BatteryAmount": 2,
-  "SBATChangeThreshold": 0.84
+  "SBATChangeThreshold": 0.84,
+  "Battery1FirmwareAddress": "ManufacturerDate",
+  "Battery1FirmwareVersion": "20180301",
+  "Battery2FirmwareAddress": "ManufacturerDate",
+  "Battery2FirmwareVersion": "20180301"
 }

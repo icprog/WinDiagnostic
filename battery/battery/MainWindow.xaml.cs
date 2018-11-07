@@ -437,6 +437,10 @@ namespace battery
             CorrectTolerance = (double)jobject.CorrectTolerance;
             BatteryAmount = (int)jobject.BatteryAmount;
             SBATChangeThreshold = (double)jobject.SBATChangeThreshold;
+            Battery1FirmwareAddress = jobject.Battery1FirmwareAddress.ToString();
+            Battery1FirmwareVersion = jobject.Battery1FirmwareVersion.ToString();
+            Battery2FirmwareAddress = jobject.Battery2FirmwareAddress.ToString();
+            Battery2FirmwareVersion = jobject.Battery2FirmwareVersion.ToString();
 
             Trace.WriteLine("Battery_Load");
 

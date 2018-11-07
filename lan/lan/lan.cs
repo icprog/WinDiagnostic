@@ -285,7 +285,7 @@ namespace lan
             NetworkInterface[] nics = NetworkInterface.GetAllNetworkInterfaces();
             foreach (NetworkInterface adapter in nics)
             {
-                if (adapter.NetworkInterfaceType.Equals(NetworkInterfaceType.Ethernet) && (adapter.Description.IndexOf("Intel") >= 0 || adapter.Description.IndexOf("Broadcom") >= 0 || adapter.Description.IndexOf("Realtek") >= 0))
+                if (adapter.NetworkInterfaceType.Equals(NetworkInterfaceType.Ethernet) && adapter.OperationalStatus == OperationalStatus.Up)
                 {
                     if (NumberOfEthernets <= 2) NumberOfEthernets++;
                     // Trace.WriteLine("NumberOfEthernets : " + NumberOfEthernets);

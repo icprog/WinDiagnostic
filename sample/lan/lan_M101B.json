@@ -1,8 +1,8 @@
 {
   "name": "lan_m101b",
-  "TestProduct": "IB32",
+  "TestProduct": "IB80",
   "IsBenzIH83": false,
   "PingAddress": "8.8.8.8",
   "ShowWindow": false,
-  "LanNum": 1
+  "LanNum": 2
 }

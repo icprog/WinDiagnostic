@@ -89,7 +89,7 @@ namespace lan
         [DllImport("kernel32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         [Conditional("DEBUG")]
-        static extern void AllocConsole();
+        static extern void AllocTrace();
         #endregion
 
         public lan()
@@ -101,15 +101,10 @@ namespace lan
         {
             var exepath = System.AppDomain.CurrentDomain.BaseDirectory;
             return Path.Combine(exepath, path);
-        }        
+        }
 
         private void LAN_Load(object sender, EventArgs e)
         {
-            AllocConsole();
-
-            GetNetworkInformation(NetworkInterfaceType.Wireless80211);
-            GetNetworkInformation(NetworkInterfaceType.Ethernet);
-
             result["result"] = "FAIL";
             var jsonconfig = GetFullPath("config.json");
             if (!File.Exists(jsonconfig))
@@ -140,7 +135,6 @@ namespace lan
             NetworkChange.NetworkAddressChanged += new NetworkAddressChangedEventHandler(AddressChangedCallback);
             ShowEthernetInterfaces();
             Trace.WriteLine("Number Of Ethernets : " + NumberOfEthernets);
-            Console.WriteLine("Number Of Ethernets : " + NumberOfEthernets);
 
             // OP測試前要先插cable, 先尋找UP狀態的網卡再指定到第一順位的網路介面, 只測試具有連線能力的側邊LAN Port
             if ((TestProduct.Equals("IBWD") || IsBenzIH83))
@@ -174,6 +168,7 @@ namespace lan
                     Trace.WriteLine("Can't find available network interfaces.");
                 }
                 checkTestStatus("Can't find available network interfaces.");
+                return;
             }
             else if (NumberOfEthernets.Equals(1))
             {
@@ -218,18 +213,17 @@ namespace lan
                 {
                     if (IsEthernet1Available())
                     {
-                        tokenSource.Cancel();
                         buttonConnectEthernet1_Click(null, new EventArgs());
                     }
                     else
                         bDoNext = true;
 
-                    while (!token.IsCancellationRequested)
+                    while (true)
                     {
-                        //if (bDoNext)
-                        //    break;
-                        Console.WriteLine("Wait...");
-                        Thread.Sleep(100);
+                        if (bDoNext)
+                            break;
+                        Trace.WriteLine("Wait...");
+                        Thread.Sleep(500);
                     }
 
                     if (NumberOfEthernets >= 2)
@@ -240,13 +234,6 @@ namespace lan
                     }
                 }
             }, token);
-
-            t.Wait(6000);
-
-            if(!t.IsCompleted)
-                checkTestStatus("FAIL");
-
-            tokenSource.Cancel();
         }
 
         private bool CheckLanSettingReady()
@@ -266,12 +253,12 @@ namespace lan
         }
         private bool IsEthernet1Available()
         {
-            Console.WriteLine("IsEthernet1Available ****** {0}", Ethernet1_MAC);
+            Trace.WriteLine("IsEthernet1Available ****** {0}", Ethernet1_OperationalStatus);
             return Ethernet1_OperationalStatus.Equals("Up") ? true : false;
         }
         private bool IsEthernet2Available()
         {
-            Console.WriteLine("IsEthernet2Available ****** {0}", Ethernet2_MAC);
+            Trace.WriteLine("IsEthernet2Available ****** {0}", Ethernet2_OperationalStatus);
             return Ethernet2_OperationalStatus.Equals("Up") ? true : false;
         }
 
@@ -281,8 +268,9 @@ namespace lan
         }
 
         private void ShowEthernetInterfaces()
-        {            
+        {
             NetworkInterface[] nics = NetworkInterface.GetAllNetworkInterfaces();
+
             foreach (NetworkInterface adapter in nics)
             {
                 if (adapter.NetworkInterfaceType.Equals(NetworkInterfaceType.Ethernet) && adapter.OperationalStatus == OperationalStatus.Up)
@@ -307,6 +295,27 @@ namespace lan
                         else if (adapter.Description.Equals(Ethernet2_Description)) Ethernet2_OperationalStatus = adapter.OperationalStatus.ToString();
                     }
 
+                    var ip = adapter.GetIPProperties().UnicastAddresses.Where(d => d.Address.AddressFamily == AddressFamily.InterNetwork).Select(e => e.Address);
+                    var gateway = adapter.GetIPProperties().GatewayAddresses.Where(d => d.Address.AddressFamily == AddressFamily.InterNetwork).Select(e => e.Address);
+                    var interfaceindex = adapter.GetIPProperties().GetIPv4Properties().Index;
+                    Trace.WriteLine(adapter.Description);
+                    Trace.WriteLine(string.Format("interface: ", interfaceindex));
+                    Trace.WriteLine(string.Format("ip count: {0}", ip.Count()));
+                    Trace.WriteLine(string.Format("gateway count: {0}", gateway.Count()));
+                    foreach (var k in ip)
+                    {
+                        var s = k.ToString();
+                        Trace.WriteLine("ip: {0}", s);
+                    }
+                    foreach (var k in gateway)
+                    {
+                        var s = k.ToString();
+                        Trace.WriteLine("gateway: {0}", s);
+                        EthernetGateway.Add(s);
+                        EthernetInterface.Add(interfaceindex);
+
+                    }
+
                     if (IsDebugMode)
                     {
                         Trace.WriteLine(String.Empty.PadLeft(adapter.Description.Length, '='));
@@ -318,12 +327,12 @@ namespace lan
                         IPInterfaceProperties properties = adapter.GetIPProperties();
                         string versions = "";
 
-                        Console.WriteLine(String.Empty.PadLeft(adapter.Description.Length, '=')); ;
-                        Console.WriteLine(adapter.Description);
-                        Console.WriteLine(String.Empty.PadLeft(adapter.Description.Length, '='));
-                        Console.WriteLine("  Interface type .......................... : " + adapter.NetworkInterfaceType);
-                        Console.WriteLine("  Physical Address ........................ : " + adapter.GetPhysicalAddress().ToString());
-                        Console.WriteLine("  Operational status ...................... : " + adapter.OperationalStatus);
+                        Trace.WriteLine(String.Empty.PadLeft(adapter.Description.Length, '=')); ;
+                        Trace.WriteLine(adapter.Description);
+                        Trace.WriteLine(String.Empty.PadLeft(adapter.Description.Length, '='));
+                        Trace.WriteLine("  Interface type .......................... : " + adapter.NetworkInterfaceType);
+                        Trace.WriteLine("  Physical Address ........................ : " + adapter.GetPhysicalAddress().ToString());
+                        Trace.WriteLine("  Operational status ...................... : " + adapter.OperationalStatus);
 
                         // Create a display string for the supported IP versions.
                         if (adapter.Supports(NetworkInterfaceComponent.IPv4))
@@ -339,7 +348,6 @@ namespace lan
                             versions += "IPv6";
                         }
                         Trace.WriteLine("  IP version .............................. : " + versions);
-                        Console.WriteLine("  IP version .............................. : " + versions);
 
                         // The following information is not useful for loopback adapters.
                         if (adapter.NetworkInterfaceType == NetworkInterfaceType.Loopback)
@@ -347,7 +355,6 @@ namespace lan
                             continue;
                         }
                         Trace.WriteLine("  DNS suffix .............................. : " + properties.DnsSuffix);
-                        Console.WriteLine("  DNS suffix .............................. : " + properties.DnsSuffix);
 
                         if (adapter.Supports(NetworkInterfaceComponent.IPv4))
                         {
@@ -361,13 +368,13 @@ namespace lan
                         Trace.WriteLine("  Multicast ............................... : " + adapter.SupportsMulticast);
                         Trace.WriteLine("");
 
-                        Console.WriteLine("  DNS enabled ............................. : " + properties.IsDnsEnabled);
-                        Console.WriteLine(adapter.Description);
-                        Console.WriteLine("  Dynamically configured DNS .............. : " + properties.IsDynamicDnsEnabled);
-                        Console.WriteLine("  Interface type .......................... : " + adapter.NetworkInterfaceType);
-                        Console.WriteLine("  Receive Only ............................ : " + adapter.IsReceiveOnly);
-                        Console.WriteLine("  Multicast ............................... : " + adapter.SupportsMulticast);
-                        Console.WriteLine();
+                        Trace.WriteLine("  DNS enabled ............................. : " + properties.IsDnsEnabled);
+                        Trace.WriteLine(adapter.Description);
+                        Trace.WriteLine("  Dynamically configured DNS .............. : " + properties.IsDynamicDnsEnabled);
+                        Trace.WriteLine("  Interface type .......................... : " + adapter.NetworkInterfaceType);
+                        Trace.WriteLine("  Receive Only ............................ : " + adapter.IsReceiveOnly);
+                        Trace.WriteLine("  Multicast ............................... : " + adapter.SupportsMulticast);
+                        Trace.WriteLine("");
                     }
                 }
             }
@@ -399,7 +406,6 @@ namespace lan
         private void mBackgroundWorkerLAN_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             if (IsDebugMode) Trace.WriteLine("LAN Test Completed.");
-            if (IsDebugMode) Console.WriteLine("LAN Test Completed.");
         }
         #endregion
 
@@ -523,6 +529,7 @@ namespace lan
         #region Test Result
         private void checkTestStatus(String testResult)
         {
+            Trace.WriteLine("testresult: " + testResult);
             buttonClearPingAddress.Enabled = true;
 
             if (NumberOfEthernets.Equals(1))
@@ -571,11 +578,13 @@ namespace lan
                     {
                         labelEthernet1_Result.ForeColor = Color.Red;
                         labelEthernet1_Result.Text = "FAIL";
+                        //testResult = labelEthernet1.Text + " FAIL";
                     }
                     else if (!IsEthernet1Available() && IsEthernet2Available())
                     {
                         labelEthernet2_Result.ForeColor = Color.Red;
                         labelEthernet2_Result.Text = "FAIL";
+                        //testResult = labelEthernet2.Text + " FAIL";
                     }
                     else
                     {
@@ -618,10 +627,6 @@ namespace lan
                 labelResult.ForeColor = Color.Green;
                 labelResult.Text = "PASS";
 
-                //TestReport.setResult("LAN", TestReport.PassState.PASS);
-                //TestReport.setEIPResult("LAN", "@PASS");
-                //PublicFunction.AddTestNameToCurrentAlarmReport(true, "LAN");// 儲存自動測項中PASS的測項名稱
-                GotoNextTestItem("PASS");
                 result["result"] = "PASS";
                 result["EIPLog"] = new JObject
                 {
@@ -632,17 +637,8 @@ namespace lan
             else
             {
                 labelResult.ForeColor = Color.Red;
-                //if (IsLan1AndLan2Tested()) labelResult.Text = "FAIL";
                 labelResult.Text = "FAIL";
 
-                //TestReport.setResult("LAN", TestReport.PassState.FAIL);
-                //if (MainForm.PingStatusSuccess <= 1) TestReport.setResult("Reason", TestReport.PassState.FAIL, testResult);
-
-                //if (MainForm.UploadDataToEIP) TestReport.setEIPResult("LAN", "@FAIL");
-
-                //// 自動測項此時測試失敗, 讓SerialNumber頁面背景閃紅色
-                //PublicFunction.AddTestNameToCurrentAlarmReport(false, "LAN");// 儲存自動測項中FAIL的測項名稱
-                GotoNextTestItem("FAIL");
                 result["result"] = "FAIL";
                 result["EIPLog"] = new JObject
                 {
@@ -652,19 +648,10 @@ namespace lan
             }
             lock (objlock)
             {
-                if(IsLan1AndLan2Tested())
+                if (IsLan1AndLan2Tested())
                     ResultToJsonFile();
             }
 
-            for (int i = 0; i < EthernetGateway.Count(); i++)
-                SetRouteTable(EthernetGateway[i], EthernetInterface[i], 1, Operation.Add);
-
-            //if (MainForm.tryConnectNetCount > 1) // 當Ping的次數>1才是真正的有開始進行連線測試, 此時才需要紀錄SNR跟連線成功
-            //{
-            //    TestReport.setResult("Total Ping Count", TestReport.PassState.SKIP, MainForm.tryConnectNetCount.ToString());
-            //    TestReport.setResult("Success Ping Count ", TestReport.PassState.SKIP, MainForm.PingStatusSuccess.ToString());
-            //    if (MainForm.UploadDataToEIP) TestReport.setEIPResult("LAN_SUCCESSRATE", "@" + MainForm.PingStatusSuccess / MainForm.tryConnectNetCount);
-            //}
         }
 
         private bool IsLan1AndLan2Tested()
@@ -677,23 +664,6 @@ namespace lan
             else return false;
         }
 
-        private void GotoNextTestItem(string testResult)
-        {
-            //MainForm.SetSingleTestTime(this.Name); // 設定單一測項測試時間
-            //try
-            //{
-            //    if (this.InvokeRequired)
-            //    {
-            //        Action<string> GotoAutoLoadNextTest = (testResultToMainForm) => { MainForm.AutoLoadNextTest(testResultToMainForm); };
-            //        GotoAutoLoadNextTest.Invoke(testResult);
-            //    }
-            //    else MainForm.AutoLoadNextTest(testResult);
-            //}
-            //catch (Exception ex)
-            //{
-            //    if (MainForm.IsDebugMode) Trace.WriteLine(ex.Message);
-            //}
-        }
         #endregion
 
         #region Update UI
@@ -713,7 +683,7 @@ namespace lan
         private void UpdateDetails(string msg)
         {
             if (IsDebugMode) Trace.WriteLine(msg);
-            if (IsDebugMode) Console.WriteLine(msg);
+            if (IsDebugMode) Trace.WriteLine(msg);
             txtLANDetails.Text = txtLANDetails.Text + msg + Environment.NewLine;
             if (txtLANDetails.Text.Length > 10000) txtLANDetails.Text = txtLANDetails.Text.Substring(txtLANDetails.Text.Length - 1000, 1000);
             txtLANDetails.SelectionStart = txtLANDetails.Text.Length;
@@ -729,41 +699,53 @@ namespace lan
 
         private void buttonConnectEthernet1_Click(object sender, EventArgs e)
         {
-            Console.WriteLine("***** buttonConnectEthernet1_Click");
-
-            //SetRouteTable(EthernetGateway[0], EthernetInterface[0], 1, Operation.Delete);
-
-            if (CheckLanSettingReady() && IsEthernet1Available())
+            try
             {
-                ResetUiToDefaultStatus();
+                Trace.WriteLine("***** buttonConnectEthernet1_Click");
 
-                labelEthernet1_Result.ForeColor = Color.Blue;
-                labelEthernet1_Result.Text = "Unknown";
+                if (EthernetGateway.Count >=2 && EthernetInterface.Count >=2)
+                    SetRouteTable(EthernetGateway[1], EthernetInterface[1], 1, Operation.Delete);
 
-                mBackgroundWorkerLAN.RunWorkerAsync(); // TestNetworkStability();
+                if (CheckLanSettingReady() && IsEthernet1Available())
+                {
+                    ResetUiToDefaultStatus();
+
+                    labelEthernet1_Result.ForeColor = Color.Blue;
+                    labelEthernet1_Result.Text = "Unknown";
+
+                    mBackgroundWorkerLAN.RunWorkerAsync(); // TestNetworkStability();
+                }
+                else if (IsEthernet1Available() && IsEthernet2Available())
+                {
+                    // 如果是兩個網路都插著網路線而且不拔除，就不讓它繼續測試
+                    //ShowDialogMessageBox("Make sure there is only one network that can be connected.", "Attention", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    if (IsDebugMode) Trace.WriteLine("Make sure there is only one network that can be connected.");
+                    if (IsDebugMode) Trace.WriteLine("Make sure there is only one network that can be connected.");
+                }
+                else
+                {
+                    //DialogResult ResultLAN1 = ShowDialogMessageBox("LAN1 is unavailable. Please check setting or cable.\r\nThis application can be exited by click cancel button", "Attention", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
+                    //if (ResultLAN1 == DialogResult.Cancel) Application.Exit();
+
+                    if (IsDebugMode) Trace.WriteLine("LAN1 is unavailable. Please check setting or cable.\r\nThis application can be exited by click cancel button.");
+                    if (IsDebugMode) Trace.WriteLine("LAN1 is unavailable. Please check setting or cable.\r\nThis application can be exited by click cancel button.");
+                }
             }
-            else if (IsEthernet1Available() && IsEthernet2Available())
+            catch (Exception ex)
             {
-                // 如果是兩個網路都插著網路線而且不拔除，就不讓它繼續測試
-                //ShowDialogMessageBox("Make sure there is only one network that can be connected.", "Attention", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                if (IsDebugMode) Trace.WriteLine("Make sure there is only one network that can be connected.");
-                if (IsDebugMode) Console.WriteLine("Make sure there is only one network that can be connected.");
+                Trace.WriteLine(ex);
             }
-            else
-            {
-                //DialogResult ResultLAN1 = ShowDialogMessageBox("LAN1 is unavailable. Please check setting or cable.\r\nThis application can be exited by click cancel button", "Attention", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
-                //if (ResultLAN1 == DialogResult.Cancel) Application.Exit();
 
-                if (IsDebugMode) Trace.WriteLine("LAN1 is unavailable. Please check setting or cable.\r\nThis application can be exited by click cancel button.");
-                if (IsDebugMode) Console.WriteLine("LAN1 is unavailable. Please check setting or cable.\r\nThis application can be exited by click cancel button.");
-            }
         }
 
         private void buttonConnectEthernet2_Click(object sender, EventArgs e)
         {
-            Console.WriteLine("***** buttonConnectEthernet2_Click");
+            Trace.WriteLine("***** buttonConnectEthernet2_Click");
 
-            //SetRouteTable(EthernetGateway[1], EthernetInterface[1], 1, Operation.Delete);
+            if (EthernetGateway.Count >= 1 && EthernetInterface.Count >= 1)
+                SetRouteTable(EthernetGateway[0], EthernetInterface[0], 1, Operation.Delete);
+            if (EthernetGateway.Count >= 2 && EthernetInterface.Count >= 2)
+                SetRouteTable(EthernetGateway[1], EthernetInterface[1], 1, Operation.Add);
 
             if (CheckLanSettingReady() && IsEthernet2Available())
             {
@@ -791,10 +773,6 @@ namespace lan
 
         private void ResetUiToDefaultStatus()
         {
-            // 一旦載入測項/重測, 除非有測試結果, 不然不讓使用者點選清單
-            //MainForm.isTestItemLocked = true; // Retry
-            //MainForm.TimerCheckTestItemListLockStatus.Start();
-
             labelResult.ForeColor = Color.Black;
             labelResult.Text = "Not Result";
 
@@ -837,56 +815,9 @@ namespace lan
                 Exit();
         }
 
-        bool GetNetworkInformation(NetworkInterfaceType NetworkInterfaceType)
-        {
-            try
-            {
-                var network = NetworkInterface.GetAllNetworkInterfaces()
-                .Where(e => e.NetworkInterfaceType == NetworkInterfaceType
-                && e.OperationalStatus == OperationalStatus.Up).ToList();
-
-                foreach (var v in network)
-                {
-                    var ip = v.GetIPProperties().UnicastAddresses.Where(d => d.Address.AddressFamily == AddressFamily.InterNetwork).Select(e => e.Address);
-                    var gateway = v.GetIPProperties().GatewayAddresses.Where(d => d.Address.AddressFamily == AddressFamily.InterNetwork).Select(e => e.Address);
-                    var interfaceindex = v.GetIPProperties().GetIPv4Properties().Index;
-                    Trace.WriteLine(v.Description);
-                    Trace.WriteLine(string.Format("interface: ", interfaceindex));
-                    Trace.WriteLine(string.Format("ip count: {0}", ip.Count()));
-                    Trace.WriteLine(string.Format("gateway count: {0}", gateway.Count()));
-                    foreach (var k in ip)
-                    {
-                        var s = k.ToString();
-                        Trace.WriteLine("ip: {0}", s);
-                    }
-                    foreach (var k in gateway)
-                    {
-                        var s = k.ToString();
-                        Trace.WriteLine("gateway: {0}", s);
-                        if (NetworkInterfaceType == NetworkInterfaceType.Ethernet)
-                        {
-                            EthernetGateway.Add(s);
-                            EthernetInterface.Add(interfaceindex);
-                        }
-                        else if (NetworkInterfaceType == NetworkInterfaceType.Wireless80211)
-                        {
-                            WiFiGateway.Add(s);
-                            WiFiInterface.Add(interfaceindex);
-                        }
-                    }
-                }
-            }
-            catch(Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
-
-            return true;
-        }
-
         bool SetRouteTable(string gateway, int interfaceindex, int metric, Operation operation)
         {
-            Console.WriteLine("***** SetRouteTable");
+            Trace.WriteLine("***** SetRouteTable");
 
             try
             {
@@ -917,10 +848,10 @@ namespace lan
                         {
                             command = string.Format("route change 0.0.0.0 mask 0.0.0.0 {0} metric {1} if {2}", gateway, metric, interfaceindex);
                         }
-                        Console.WriteLine(command);
+                        Trace.WriteLine(command);
                         sw.WriteLine(command);
                         command = string.Format("route delete 192.168.0.0");
-                        Console.WriteLine(command);
+                        Trace.WriteLine(command);
                         sw.WriteLine(command);
                         command = string.Format("route delete 192.168.120.0");
                         sw.WriteLine(command);
@@ -932,9 +863,15 @@ namespace lan
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                Trace.WriteLine(ex);
                 return false;
             }
+        }
+
+        private void lan_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            for (int i = 0; i < EthernetGateway.Count(); i++)
+                SetRouteTable(EthernetGateway[i], EthernetInterface[i], 1, Operation.Add);
         }
     }
 }
